@@ -7,142 +7,120 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f4f4f4;
+            margin: 20px;
+            max-width: 400px;
         }
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-        }
-        .form-group {
+        .row {
+            display: flex;
+            flex-direction: column;
             margin-bottom: 15px;
         }
         label {
-            display: block;
             margin-bottom: 5px;
+            font-size: 14px;
             font-weight: bold;
         }
-        input[type="number"], select {
+        input, select, button {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
             font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
         button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            font-size: 18px;
+            margin-top: 20px;
+            background-color: #007BFF;
+            color: white;
+            font-weight: bold;
             cursor: pointer;
-
-            /* 기본 스타일로 변경 */
-            background-color: transparent;
-            color: inherit;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-
-            /* iOS 기본 버튼 스타일 복원 */
-            -webkit-appearance: button; 
-            appearance: button; 
         }
         button:hover {
-            background-color: #f4f4f4; /* 선택적 호버 효과 */
+            background-color: #0056b3;
         }
         #result {
             margin-top: 20px;
-            padding: 15px;
-            background-color: #e8f4fd;
-            border-radius: 4px;
+            font-size: 18px;
             font-weight: bold;
-        }
-        @media (max-width: 480px) {
-            body {
-                font-size: 18px;
-            }
-            input[type="number"], select, button {
-                font-size: 18px;
-            }
+            text-align: center;
+            color: #333;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-height: 40px; /* Ensure visibility even when no result */
         }
     </style>
 </head>
 <body>
-    <h1>Leverage Calculator</h1>
-    <div class="form-group">
+    <h1 style="text-align: center;">Leverage Calculator</h1>
+
+    <div class="row">
         <label for="position">Position:</label>
         <select id="position">
             <option value="long">Long</option>
             <option value="short">Short</option>
         </select>
     </div>
-    <div class="form-group">
+
+    <div class="row">
         <label for="entryPrice">Entry Price:</label>
-        <input type="number" id="entryPrice" step="0.01" required>
+        <input type="number" id="entryPrice" placeholder="Enter entry price">
     </div>
-    <div class="form-group">
-        <label for="stopLossPrice">Stop Loss Price:</label>
-        <input type="number" id="stopLossPrice" step="0.01" required>
+
+    <div class="row">
+        <label for="lossPrice">Stop-Loss Price:</label>
+        <input type="number" id="lossPrice" placeholder="Enter stop-loss price">
     </div>
-    <div class="form-group">
-        <label for="coverablePercentage">Coverable Percentage (%):</label>
-        <select id="coverablePercentage">
-            <option value="10">10%</option>
-            <option value="20">20%</option>
-            <option value="25">25%</option>
-            <option value="30">30%</option>
-            <option value="40">40%</option>
+
+    <div class="row">
+        <label for="coverPercent">Coverable Percentage (%):</label>
+        <select id="coverPercent">
+            <option value="90">10%</option>
+            <option value="85">15%</option>
+            <option value="80">20%</option>
+            <option value="75">25%</option>
+            <option value="70">30%</option>
+            <option value="60">40%</option>
             <option value="50">50%</option>
         </select>
     </div>
 
-    <!-- Button with onclick and ontouchstart events -->
-    <button onclick="calculate()" ontouchstart="calculate()">Calculate</button>
+    <button onclick="calculateLeverage()">Calculate</button>
 
-    <!-- Result display area -->
-    <div id="result">The result will be displayed here.</div>
+    <div id="result">Result will appear here.</div>
 
-    <!-- JavaScript code -->
     <script>
-        function calculate() {
-            const position = document.getElementById('position').value; // Get position value
-            const entryPrice = parseFloat(document.getElementById('entryPrice').value); // Entry price
-            const stopLossPrice = parseFloat(document.getElementById('stopLossPrice').value); // Stop loss price
-            const coverablePercentage = parseFloat(document.getElementById('coverablePercentage').value) / 100; // Coverable percentage
+        function calculateLeverage() {
+            const position = document.getElementById("position").value;
+            const entryPrice = parseFloat(document.getElementById("entryPrice").value);
+            const lossPrice = parseFloat(document.getElementById("lossPrice").value);
+            const coverPercent = parseFloat(document.getElementById("coverPercent").value);
 
-            // Validate input values
-            if (isNaN(entryPrice) || isNaN(stopLossPrice)) {
-                document.getElementById('result').innerHTML = 'Please enter all values correctly.';
-                return; // Exit function
+            const resultElement = document.getElementById("result");
+
+            if (isNaN(entryPrice) || isNaN(lossPrice)) {
+                resultElement.textContent = "Please enter both entry price and stop-loss price.";
+                resultElement.style.color = "red"; // Highlight error messages
+                return;
             }
 
-            let leverage; // Calculate leverage
-            if (position === 'long') {
-                leverage = 1 / (1 - (stopLossPrice / entryPrice));
-                if (stopLossPrice >= entryPrice) { // Warn if stop loss price is greater than or equal to entry price
-                    document.getElementById('result').innerHTML = 'For a long position, the stop loss price must be lower than the entry price.';
-                    return; // Exit function
-                }
+            let leverage;
+
+            if (position === "long") {
+                const priceDropPercent = Math.abs((lossPrice - entryPrice) / entryPrice) * 100;
+                leverage = coverPercent / priceDropPercent;
+            } else if (position === "short") {
+                const priceRisePercent = Math.abs((entryPrice - lossPrice) / entryPrice) * 100;
+                leverage = coverPercent / priceRisePercent;
+            }
+
+            if (leverage > 0) {
+                resultElement.textContent = `Result: The maximum leverage is ${leverage.toFixed(2)}x.`;
+                resultElement.style.color = "#333"; // Normal text color
             } else {
-                leverage = 1 / ((stopLossPrice / entryPrice) - 1);
-                if (stopLossPrice <= entryPrice) { // Warn if stop loss price is less than or equal to entry price
-                    document.getElementById('result').innerHTML = 'For a short position, the stop loss price must be higher than the entry price.';
-                    return; // Exit function
-                }
+                resultElement.textContent = "Unable to calculate leverage. Please check your values.";
+                resultElement.style.color = "red"; // Highlight error messages
             }
-
-            const maxLeverage = 1 / coverablePercentage; // Calculate maximum safe leverage
-            const recommendedLeverage = Math.min(leverage, maxLeverage); // Calculate recommended leverage
-
-            // Display results
-            document.getElementById('result').innerHTML = `
-                Calculated Leverage: ${leverage.toFixed(2)}x<br>
-                Maximum Safe Leverage: ${maxLeverage.toFixed(2)}x<br>
-                Recommended Leverage: ${recommendedLeverage.toFixed(2)}x
-            `;
         }
     </script>
 </body>
