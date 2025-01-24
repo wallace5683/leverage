@@ -132,23 +132,10 @@
                 return;
             }
 
-            let leverage;
-            if (position === 'long') {
-                leverage = 1 / (1 - (stopLossPrice / entryPrice));
-            } else {
-                leverage = 1 / ((stopLossPrice / entryPrice) - 1);
-            }
-
-            const maxLeverage = 1 / (1 - coverablePercentage);
-            const recommendedLeverage = Math.min(leverage, maxLeverage);
+            const leverage = (coverablePercentage / 0.1) * 5;
 
             const resultElement = document.getElementById('result');
-            resultElement.innerHTML = '';
-            resultElement.appendChild(document.createTextNode(`Calculated Leverage: ${leverage.toFixed(2)}x`));
-            resultElement.appendChild(document.createElement('br'));
-            resultElement.appendChild(document.createTextNode(`Maximum Safe Leverage: ${maxLeverage.toFixed(2)}x`));
-            resultElement.appendChild(document.createElement('br'));
-            resultElement.appendChild(document.createTextNode(`Recommended Leverage: ${recommendedLeverage.toFixed(2)}x`));
+            resultElement.innerHTML = `Leverage: ${leverage.toFixed(2)}x`;
         }
 
         document.addEventListener('DOMContentLoaded', function() {
