@@ -55,6 +55,10 @@
             border-radius: 4px;
             font-weight: bold;
         }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
         @media (max-width: 480px) {
             body {
                 font-size: 18px;
@@ -76,36 +80,55 @@
     </div>
     <div class="form-group">
         <label for="entryPrice">Entry Price:</label>
-        <input type="text" id="entryPrice" required>
+        <input type="text" id="entryPrice" required placeholder="Enter positive number">
     </div>
     <div class="form-group">
         <label for="stopLossPrice">Stop-Loss Price:</label>
-        <input type="text" id="stopLossPrice" required>
+        <input type="text" id="stopLossPrice" required placeholder="Enter positive number">
     </div>
     <div class="form-group">
         <label for="coverablePercentage">Coverable Percentage (%):</label>
         <select id="coverablePercentage">
-            <option value="10">10%</option>
-            <option value="20">20%</option>
-            <option value="25">25%</option>
-            <option value="30">30%</option>
-            <option value="40">40%</option>
-            <option value="50">50%</option>
+            <option value="0.1">10%</option>
+            <option value="0.2">20%</option>
+            <option value="0.25">25%</option>
+            <option value="0.3">30%</option>
+            <option value="0.4">40%</option>
+            <option value="0.5">50%</option>
         </select>
     </div>
     <button id="calculateButton">Calculate</button>
     <div id="result">Result will appear here.</div>
+    <div id="error" class="error"></div>
 
     <script>
         function calculate() {
-            console.log('Calculate function called');
+            // Clear previous errors
+            document.getElementById('error').textContent = '';
+            
             const position = document.getElementById('position').value;
             const entryPrice = parseFloat(document.getElementById('entryPrice').value);
             const stopLossPrice = parseFloat(document.getElementById('stopLossPrice').value);
-            const coverablePercentage = parseFloat(document.getElementById('coverablePercentage').value) / 100;
+            const coverablePercentage = parseFloat(document.getElementById('coverablePercentage').value);
 
+            // Enhanced validation
             if (isNaN(entryPrice) || isNaN(stopLossPrice)) {
-                document.getElementById('result').textContent = 'Please enter valid numbers.';
+                document.getElementById('error').textContent = 'Please enter valid numbers.';
+                return;
+            }
+
+            if (entryPrice <= 0 || stopLossPrice <= 0) {
+                document.getElementById('error').textContent = 'Prices must be positive numbers.';
+                return;
+            }
+
+            if (position === 'long' && stopLossPrice >= entryPrice) {
+                document.getElementById('error').textContent = 'For long positions, stop-loss must be below entry price.';
+                return;
+            }
+
+            if (position === 'short' && stopLossPrice <= entryPrice) {
+                document.getElementById('error').textContent = 'For short positions, stop-loss must be above entry price.';
                 return;
             }
 
@@ -116,7 +139,7 @@
                 leverage = 1 / ((stopLossPrice / entryPrice) - 1);
             }
 
-            const maxLeverage = 1 / coverablePercentage;
+            const maxLeverage = 1 / (1 - coverablePercentage);
             const recommendedLeverage = Math.min(leverage, maxLeverage);
 
             const resultElement = document.getElementById('result');
