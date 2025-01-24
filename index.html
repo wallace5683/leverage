@@ -75,12 +75,12 @@
     <div class="row">
         <label for="coverPercent">Coverable Percentage (%):</label>
         <select id="coverPercent">
-            <option value="90">10%</option>
-            <option value="85">15%</option>
-            <option value="80">20%</option>
-            <option value="75">25%</option>
-            <option value="70">30%</option>
-            <option value="60">40%</option>
+            <option value="10">10%</option>
+            <option value="15">15%</option>
+            <option value="20">20%</option>
+            <option value="25">25%</option>
+            <option value="30">30%</option>
+            <option value="40">40%</option>
             <option value="50">50%</option>
         </select>
     </div>
@@ -115,7 +115,7 @@
             }
 
             if (leverage > 0) {
-                resultElement.textContent = `Result: The maximum leverage is ${leverage.toFixed(2)}x.`;
+                resultElement.textContent = `Result: ${leverage.toFixed(2)}x.`;
                 resultElement.style.color = "#333"; // Normal text color
             } else {
                 resultElement.textContent = "Unable to calculate leverage. Please check your values.";
