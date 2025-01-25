@@ -131,8 +131,8 @@
         </div>
 
         <div class="row">
-            <label for="lossPrice">Loss Cut Price:</label>
-            <input type="text" id="lossPrice" placeholder="Enter loss cut price" oninput="formatInput(this)" inputmode="decimal">
+            <label for="lossCutPrice">Loss Cut Price:</label>
+            <input type="text" id="lossCutPrice" placeholder="Enter loss cut price" oninput="formatInput(this)" inputmode="decimal">
         </div>
 
         <div class="row">
@@ -169,24 +169,24 @@
         function calculateLeverage() {
             const position = document.getElementById("position").value;
             const entryPrice = parseFormattedNumber(document.getElementById("entryPrice").value);
-            const lossPrice = parseFormattedNumber(document.getElementById("lossPrice").value);
+            const lossCutPrice = parseFormattedNumber(document.getElementById("lossCutPrice").value);
             const coverPercent = parseFloat(document.getElementById("coverPercent").value);
 
             const resultElement = document.getElementById("result");
 
-            if (isNaN(entryPrice) || isNaN(lossPrice)) {
+            if (isNaN(entryPrice) || isNaN(lossCutPrice)) {
                 resultElement.textContent = "Please enter both entry price and loss cut price.";
                 resultElement.style.color = "red";
                 return;
             }
 
-            if (position === "long" && lossPrice >= entryPrice) {
+            if (position === "long" && lossCutPrice >= entryPrice) {
                 resultElement.textContent = "For Long Position, Loss Cut Price must be LOWER than Entry Price.";
                 resultElement.style.color = "red";
                 return;
             }
 
-            if (position === "short" && lossPrice <= entryPrice) {
+            if (position === "short" && lossCutPrice <= entryPrice) {
                 resultElement.textContent = "For Short Position, Loss Cut Price must be HIGHER than Entry Price.";
                 resultElement.style.color = "red";
                 return;
@@ -194,20 +194,19 @@
 
             let leverage;
             let halfTakeProfit;
+            let riskAmount = Math.abs(entryPrice - lossCutPrice);
 
             if (position === "long") {
-                const lossPercent = Math.abs((entryPrice - lossPrice) / entryPrice) * 100;
+                const lossPercent = Math.abs((entryPrice - lossCutPrice) / entryPrice) * 100;
                 leverage = coverPercent / lossPercent;
                 
-                // 커버리지 퍼센트에 맞춰 Half Take Profit 계산
-                const riskAmount = Math.abs(entryPrice - lossPrice);
+                // 커버리지에 따른 Half Take Profit 계산
                 halfTakeProfit = entryPrice + (riskAmount * (coverPercent / 100));
             } else if (position === "short") {
-                const lossPercent = Math.abs((lossPrice - entryPrice) / entryPrice) * 100;
+                const lossPercent = Math.abs((lossCutPrice - entryPrice) / entryPrice) * 100;
                 leverage = coverPercent / lossPercent;
                 
-                // 커버리지 퍼센트에 맞춰 Half Take Profit 계산
-                const riskAmount = Math.abs(lossPrice - entryPrice);
+                // 커버리지에 따른 Half Take Profit 계산
                 halfTakeProfit = entryPrice - (riskAmount * (coverPercent / 100));
             }
 
