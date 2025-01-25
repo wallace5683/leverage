@@ -156,7 +156,6 @@
 
     <script>
         function formatInput(input) {
-            // 숫자를 포맷팅하여 입력 필드에 표시
             const value = input.value.replace(/,/g, ''); // 기존 콤마 제거
             if (!isNaN(value) && value.trim() !== '') {
                 input.value = parseFloat(value).toLocaleString(); // 숫자에 콤마 추가
@@ -164,8 +163,7 @@
         }
 
         function parseFormattedNumber(value) {
-            // 콤마를 제거하고 숫자로 변환
-            return parseFloat(value.replace(/,/g, ''));
+            return parseFloat(value.replace(/,/g, '')); // 콤마 제거 후 숫자로 변환
         }
 
         function calculateLeverage() {
@@ -211,7 +209,7 @@
                 resultElement.innerHTML = `
                     <div>Result: <strong>${leverage.toFixed(2)}</strong>x</div>
                     <div style="margin-top: 15px;">Half TP:</div>
-                    <div><strong>${halfTakeProfit.toFixed(2).toLocaleString()}</strong></div>
+                    <div><strong>${halfTakeProfit.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</strong></div>
                 `;
                 resultElement.style.color = "#333";
             } else {
