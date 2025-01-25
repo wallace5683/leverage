@@ -94,7 +94,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
+            flex-direction: column; /* 결과값 여러 줄 출력 */
         }
         @media (max-width: 375px) {
             body {
@@ -151,9 +151,7 @@
 
         <button onclick="calculateLeverage()">Calculate</button>
 
-        <div id="result">
-            Result will appear here.
-        </div>
+        <div id="result">Result will appear here.</div>
     </div>
 
     <script>
@@ -187,25 +185,20 @@
             let halfTakeProfit;
 
             if (position === "long") {
-                const priceDropPercent = Math.abs((lossPrice - entryPrice) / entryPrice) * 100;
-                leverage = coverPercent / priceDropPercent;
-
-                // Calculate half take profit point
-                const targetPercent = coverPercent / 2;
-                halfTakeProfit = entryPrice + (entryPrice * (targetPercent / 100));
+                const lossPercent = Math.abs((entryPrice - lossPrice) / entryPrice) * 100;
+                leverage = coverPercent / lossPercent;
+                halfTakeProfit = entryPrice + (entryPrice * (lossPercent / 100));
             } else if (position === "short") {
-                const priceRisePercent = Math.abs((entryPrice - lossPrice) / entryPrice) * 100;
-                leverage = coverPercent / priceRisePercent;
-
-                // Calculate half take profit point
-                const targetPercent = coverPercent / 2;
-                halfTakeProfit = entryPrice - (entryPrice * (targetPercent / 100));
+                const lossPercent = Math.abs((lossPrice - entryPrice) / entryPrice) * 100;
+                leverage = coverPercent / lossPercent;
+                halfTakeProfit = entryPrice - (entryPrice * (lossPercent / 100));
             }
 
             if (leverage > 0) {
                 resultElement.innerHTML = `
                     <div>Result: <strong>${leverage.toFixed(2)}x</strong></div>
-                    <div>Half Take Profit Point: <strong>${halfTakeProfit.toFixed(2)}</strong></div>
+                    <div style="margin-top: 15px;">Half TP:</div>
+                    <div><strong>${halfTakeProfit.toFixed(2)}</strong></div>
                 `;
                 resultElement.style.color = "#333";
             } else {
