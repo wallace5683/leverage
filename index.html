@@ -156,14 +156,14 @@
 
     <script>
         function formatInput(input) {
-            const value = input.value.replace(/,/g, ''); // 기존 콤마 제거
+            const value = input.value.replace(/,/g, ''); 
             if (!isNaN(value) && value.trim() !== '') {
-                input.value = parseFloat(value).toLocaleString(); // 숫자에 콤마 추가
+                input.value = parseFloat(value).toLocaleString(); 
             }
         }
 
         function parseFormattedNumber(value) {
-            return parseFloat(value.replace(/,/g, '')); // 콤마 제거 후 숫자로 변환
+            return parseFloat(value.replace(/,/g, '')); 
         }
 
         function calculateLeverage() {
@@ -175,19 +175,19 @@
             const resultElement = document.getElementById("result");
 
             if (isNaN(entryPrice) || isNaN(lossPrice)) {
-                resultElement.textContent = "Please enter both entry price and stop-loss price.";
+                resultElement.textContent = "Please enter both entry price and loss cut price.";
                 resultElement.style.color = "red";
                 return;
             }
 
             if (position === "long" && lossPrice >= entryPrice) {
-                resultElement.textContent = "For Long Position, Stop-Loss Price must be LOWER than Entry Price.";
+                resultElement.textContent = "For Long Position, Loss Cut Price must be LOWER than Entry Price.";
                 resultElement.style.color = "red";
                 return;
             }
 
             if (position === "short" && lossPrice <= entryPrice) {
-                resultElement.textContent = "For Short Position, Stop-Loss Price must be HIGHER than Entry Price.";
+                resultElement.textContent = "For Short Position, Loss Cut Price must be HIGHER than Entry Price.";
                 resultElement.style.color = "red";
                 return;
             }
@@ -199,16 +199,16 @@
                 const lossPercent = Math.abs((entryPrice - lossPrice) / entryPrice) * 100;
                 leverage = coverPercent / lossPercent;
                 
-                // 리스크의 절반을 확보하는 지점 계산
+                // 커버리지 퍼센트에 맞춰 Half Take Profit 계산
                 const riskAmount = Math.abs(entryPrice - lossPrice);
-                halfTakeProfit = entryPrice + riskAmount / 2;
+                halfTakeProfit = entryPrice + (riskAmount * (coverPercent / 100));
             } else if (position === "short") {
                 const lossPercent = Math.abs((lossPrice - entryPrice) / entryPrice) * 100;
                 leverage = coverPercent / lossPercent;
                 
-                // 리스크의 절반을 확보하는 지점 계산
+                // 커버리지 퍼센트에 맞춰 Half Take Profit 계산
                 const riskAmount = Math.abs(lossPrice - entryPrice);
-                halfTakeProfit = entryPrice - riskAmount / 2;
+                halfTakeProfit = entryPrice - (riskAmount * (coverPercent / 100));
             }
 
             if (leverage > 0) {
