@@ -132,7 +132,7 @@
 
         <div class="row">
             <label for="lossPrice">Loss Cut Price:</label>
-            <input type="text" id="lossPrice" placeholder="Enter stop-loss price" oninput="formatInput(this)" inputmode="decimal">
+            <input type="text" id="lossPrice" placeholder="Enter loss cut price" oninput="formatInput(this)" inputmode="decimal">
         </div>
 
         <div class="row">
@@ -198,11 +198,17 @@
             if (position === "long") {
                 const lossPercent = Math.abs((entryPrice - lossPrice) / entryPrice) * 100;
                 leverage = coverPercent / lossPercent;
-                halfTakeProfit = entryPrice + (entryPrice * (coverPercent / 100));
+                
+                // 리스크의 절반을 확보하는 지점 계산
+                const riskAmount = Math.abs(entryPrice - lossPrice);
+                halfTakeProfit = entryPrice + riskAmount / 2;
             } else if (position === "short") {
                 const lossPercent = Math.abs((lossPrice - entryPrice) / entryPrice) * 100;
                 leverage = coverPercent / lossPercent;
-                halfTakeProfit = entryPrice - (entryPrice * (coverPercent / 100));
+                
+                // 리스크의 절반을 확보하는 지점 계산
+                const riskAmount = Math.abs(lossPrice - entryPrice);
+                halfTakeProfit = entryPrice - riskAmount / 2;
             }
 
             if (leverage > 0) {
