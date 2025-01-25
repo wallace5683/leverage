@@ -200,14 +200,14 @@
                 const lossPercent = Math.abs((entryPrice - lossCutPrice) / entryPrice) * 100;
                 leverage = coverPercent / lossPercent;
                 
-                // 커버리지에 따른 Half Take Profit 계산
-                halfTakeProfit = entryPrice + (riskAmount * (coverPercent / 100));
+                // 첫 익절 지점: 본절 유지를 위해 리스크의 1/2만큼만 이동
+                halfTakeProfit = entryPrice + (riskAmount * 0.5);
             } else if (position === "short") {
                 const lossPercent = Math.abs((lossCutPrice - entryPrice) / entryPrice) * 100;
                 leverage = coverPercent / lossPercent;
                 
-                // 커버리지에 따른 Half Take Profit 계산
-                halfTakeProfit = entryPrice - (riskAmount * (coverPercent / 100));
+                // 첫 익절 지점: 본절 유지를 위해 리스크의 1/2만큼만 이동
+                halfTakeProfit = entryPrice - (riskAmount * 0.5);
             }
 
             if (leverage > 0) {
