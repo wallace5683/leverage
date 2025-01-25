@@ -3,11 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leverage Check</title>
+    <title>LVG. Check</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
-        input, select, button { margin: 10px 0; padding: 5px; width: 100%; }
-        #result { margin-top: 20px; font-weight: bold; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f2f2f7;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        select, input, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border: 1px solid #d1d1d6;
+            font-size: 16px;
+            background-color: white;
+        }
+        button {
+            background-color: #007aff;
+            color: white;
+            font-weight: bold;
+            border: none;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 10px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -22,12 +51,11 @@
         <option value="5">5%</option>
         <option value="10">10%</option>
         <option value="15">15%</option>
-        <option value="20" selected>20%</option>
+        <option value="20">20%</option>
         <option value="25">25%</option>
         <option value="30">30%</option>
         <option value="40">40%</option>
         <option value="50">50%</option>
-        <option value="75">75%</option>
     </select>
     <button onclick="calculate()">Calculate</button>
     <div id="result">Result will appear here.</div>
