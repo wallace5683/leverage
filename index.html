@@ -36,7 +36,7 @@
             text-align: center;
             color: #333;
             margin: 0 0 25px;
-            font-size: 24px; /* 제목 글씨 크기를 살짝 키움 */
+            font-size: 24px;
             font-weight: bold;
             border-bottom: 1px solid #e0e0e0;
         }
@@ -94,6 +94,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-direction: column;
         }
         @media (max-width: 375px) {
             body {
@@ -137,7 +138,7 @@
         <div class="row">
             <label for="coverPercent">Coverable Percentage (%):</label>
             <select id="coverPercent">
-                <option value="5">5%</option> <!-- 5% 옵션 추가 -->
+                <option value="5">5%</option>
                 <option value="10">10%</option>
                 <option value="15">15%</option>
                 <option value="20" selected>20%</option>
@@ -150,7 +151,9 @@
 
         <button onclick="calculateLeverage()">Calculate</button>
 
-        <div id="result">Result will appear here.</div>
+        <div id="result">
+            Result will appear here.
+        </div>
     </div>
 
     <script>
@@ -181,17 +184,29 @@
             }
 
             let leverage;
+            let halfTakeProfit;
 
             if (position === "long") {
                 const priceDropPercent = Math.abs((lossPrice - entryPrice) / entryPrice) * 100;
                 leverage = coverPercent / priceDropPercent;
+
+                // Calculate half take profit point
+                const targetPercent = coverPercent / 2;
+                halfTakeProfit = entryPrice + (entryPrice * (targetPercent / 100));
             } else if (position === "short") {
                 const priceRisePercent = Math.abs((entryPrice - lossPrice) / entryPrice) * 100;
                 leverage = coverPercent / priceRisePercent;
+
+                // Calculate half take profit point
+                const targetPercent = coverPercent / 2;
+                halfTakeProfit = entryPrice - (entryPrice * (targetPercent / 100));
             }
 
             if (leverage > 0) {
-                resultElement.textContent = `Result: ${leverage.toFixed(2)}x.`;
+                resultElement.innerHTML = `
+                    <div>Result: <strong>${leverage.toFixed(2)}x</strong></div>
+                    <div>Half Take Profit Point: <strong>${halfTakeProfit.toFixed(2)}</strong></div>
+                `;
                 resultElement.style.color = "#333";
             } else {
                 resultElement.textContent = "Unable to calculate leverage. Please check your values.";
