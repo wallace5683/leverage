@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,21 +97,6 @@
             justify-content: center;
             flex-direction: column;
         }
-        @media (max-width: 375px) {
-            body {
-                padding: 20px;
-            }
-            .container {
-                padding: 15px;
-            }
-            h1 {
-                font-size: 22px;
-            }
-            input, select, button {
-                font-size: 14px;
-                padding: 10px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -174,54 +160,57 @@
 
             const resultElement = document.getElementById("result");
 
+            // Input validation
             if (isNaN(entryPrice) || isNaN(lossCutPrice)) {
                 resultElement.textContent = "Please enter both entry price and loss cut price.";
                 resultElement.style.color = "red";
                 return;
             }
 
-            if (position === "long" && lossCutPrice >= entryPrice) {
-                resultElement.textContent = "For Long Position, Loss Cut Price must be LOWER than Entry Price.";
+            // Position-specific validation
+            if ((position === "long" && lossCutPrice >= entryPrice) ||
+                (position === "short" && lossCutPrice <= entryPrice)) {
+                resultElement.textContent = position === "long" 
+                    ? "For Long Position, Loss Cut Price must be LOWER than Entry Price."
+                    : "For Short Position, Loss Cut Price must be HIGHER than Entry Price.";
                 resultElement.style.color = "red";
                 return;
             }
 
-            if (position === "short" && lossCutPrice <= entryPrice) {
-                resultElement.textContent = "For Short Position, Loss Cut Price must be HIGHER than Entry Price.";
-                resultElement.style.color = "red";
-                return;
-            }
+            const riskAmount = Math.abs(entryPrice - lossCutPrice);
+            const lossPercent = Math.abs((entryPrice - lossCutPrice) / entryPrice) * 100;
+            const leverage = coverPercent / lossPercent;
 
-            let leverage;
+            // Half TP calculation to maintain original position
             let halfTakeProfit;
-            let riskAmount = Math.abs(entryPrice - lossCutPrice);
+            let halfPositionGain;
+            let remainingLoss;
 
             if (position === "long") {
-                const lossPercent = Math.abs((entryPrice - lossCutPrice) / entryPrice) * 100;
-                leverage = coverPercent / lossPercent;
-                
-                // 첫 익절 지점: 본절 유지를 위해 리스크의 1/2만큼만 이동
-                halfTakeProfit = entryPrice + (riskAmount * 0.5);
-            } else if (position === "short") {
-                const lossPercent = Math.abs((lossCutPrice - entryPrice) / entryPrice) * 100;
-                leverage = coverPercent / lossPercent;
-                
-                // 첫 익절 지점: 본절 유지를 위해 리스크의 1/2만큼만 이동
-                halfTakeProfit = entryPrice - (riskAmount * 0.5);
+                // Calculate half TP that ensures no net loss
+                halfTakeProfit = entryPrice + ((leverage * riskAmount) / 2);
+                halfPositionGain = halfTakeProfit - entryPrice;
+                remainingLoss = riskAmount / 2;
+            } else {
+                // Short position calculation
+                halfTakeProfit = entryPrice - ((leverage * riskAmount) / 2);
+                halfPositionGain = entryPrice - halfTakeProfit;
+                remainingLoss = riskAmount / 2;
             }
 
-            if (leverage > 0) {
-                resultElement.innerHTML = `
-                    <div>Result: <strong>${leverage.toFixed(2)}</strong>x</div>
-                    <div style="margin-top: 15px;">Half TP:</div>
-                    <div><strong>${halfTakeProfit.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</strong></div>
-                `;
-                resultElement.style.color = "#333";
-            } else {
-                resultElement.textContent = "Unable to calculate leverage. Please check your values.";
-                resultElement.style.color = "red";
-            }
+            const netResult = halfPositionGain - remainingLoss;
+
+            resultElement.innerHTML = `
+                <div>Leverage: <strong>${leverage.toFixed(2)}</strong>x</div>
+                <div>Half TP: <strong>${halfTakeProfit.toLocaleString()}</strong></div>
+                <div>Half Position Gain: <strong>${halfPositionGain.toLocaleString()}</strong></div>
+                <div>Remaining Position Loss: <strong>${remainingLoss.toLocaleString()}</strong></div>
+                <div>Net Result: <strong>${netResult.toLocaleString()}</strong></div>
+            `;
+            resultElement.style.color = netResult >= 0 ? "green" : "red";
         }
     </script>
 </body>
 </html>
+
+```
