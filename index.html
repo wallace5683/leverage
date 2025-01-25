@@ -100,7 +100,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Position Maintenance Check</h1>
+        <h1>☑️LVG. Check</h1>
 
         <div class="row">
             <label for="position">Position:</label>
@@ -121,7 +121,7 @@
         </div>
 
         <div class="row">
-            <label for="coverPercent">Coverable Percentage (%):</label>
+            <label for="coverPercent">Coverable Percentage(%):</label>
             <select id="coverPercent">
                 <option value="5">5%</option>
                 <option value="10">10%</option>
@@ -190,7 +190,7 @@
 
             resultElement.innerHTML = `
                 <div>Leverage: <strong>${leverage.toFixed(2)}x</strong></div>
-                <div>Maintenance Half TP: <strong>${halfTakeProfit.toLocaleString()}</strong></div>
+                <div>Half TP: <strong>${halfTakeProfit.toLocaleString()}</strong></div>
             `;
             resultElement.style.color = "#333";
         }
