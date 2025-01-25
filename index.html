@@ -180,13 +180,10 @@
             const lossPercent = Math.abs((entryPrice - lossCutPrice) / entryPrice) * 100;
             const leverage = coverPercent / lossPercent;
 
-            // Maintenance Half TP calculation
-            let halfTakeProfit;
-            if (position === "long") {
-                halfTakeProfit = entryPrice + (riskAmount / 2);
-            } else {
-                halfTakeProfit = entryPrice - (riskAmount / 2);
-            }
+            // Half TP calculation (exactly as you described)
+            let halfTakeProfit = position === "long" 
+                ? entryPrice + riskAmount 
+                : entryPrice - riskAmount;
 
             resultElement.innerHTML = `
                 <div>Leverage: <strong>${leverage.toFixed(2)}x</strong></div>
