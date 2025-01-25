@@ -2,40 +2,75 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Leverage Calculator</title>
     <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            max-width: 400px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
         }
         .row {
             display: flex;
             flex-direction: column;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         label {
-            margin-bottom: 5px;
-            font-size: 14px;
-            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
         }
         input, select, button {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 8px;
+            appearance: none;
+            -webkit-appearance: none;
+            background-color: #f9f9f9;
+        }
+        input:focus, select:focus, button:focus {
+            outline: none;
+            border-color: #007BFF;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
         }
         button {
-            margin-top: 20px;
+            margin-top: 15px;
             background-color: #007BFF;
             color: white;
             font-weight: bold;
             cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: none;
         }
         button:hover {
             background-color: #0056b3;
+        }
+        button:active {
+            transform: scale(0.98);
         }
         #result {
             margin-top: 20px;
@@ -43,51 +78,70 @@
             font-weight: bold;
             text-align: center;
             color: #333;
-            background-color: #f9f9f9;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            min-height: 40px; /* Ensure visibility even when no result */
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        @media (max-width: 375px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 22px;
+            }
+            input, select, button {
+                font-size: 14px;
+                padding: 10px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">Leverage Calculator</h1>
+    <div class="container">
+        <h1>Leverage Calculator</h1>
 
-    <div class="row">
-        <label for="position">Position:</label>
-        <select id="position">
-            <option value="long">Long</option>
-            <option value="short">Short</option>
-        </select>
+        <div class="row">
+            <label for="position">Position:</label>
+            <select id="position">
+                <option value="long">Long</option>
+                <option value="short">Short</option>
+            </select>
+        </div>
+
+        <div class="row">
+            <label for="entryPrice">Entry Price:</label>
+            <input type="number" id="entryPrice" placeholder="Enter entry price" inputmode="decimal">
+        </div>
+
+        <div class="row">
+            <label for="lossPrice">Stop-Loss Price:</label>
+            <input type="number" id="lossPrice" placeholder="Enter stop-loss price" inputmode="decimal">
+        </div>
+
+        <div class="row">
+            <label for="coverPercent">Coverable Percentage (%):</label>
+            <select id="coverPercent">
+                <option value="10">10%</option>
+                <option value="15">15%</option>
+                <option value="20">20%</option>
+                <option value="25">25%</option>
+                <option value="30">30%</option>
+                <option value="40">40%</option>
+                <option value="50">50%</option>
+            </select>
+        </div>
+
+        <button onclick="calculateLeverage()">Calculate</button>
+
+        <div id="result">Result will appear here.</div>
     </div>
-
-    <div class="row">
-        <label for="entryPrice">Entry Price:</label>
-        <input type="number" id="entryPrice" placeholder="Enter entry price">
-    </div>
-
-    <div class="row">
-        <label for="lossPrice">Stop-Loss Price:</label>
-        <input type="number" id="lossPrice" placeholder="Enter stop-loss price">
-    </div>
-
-    <div class="row">
-        <label for="coverPercent">Coverable Percentage (%):</label>
-        <select id="coverPercent">
-            <option value="10">10%</option>
-            <option value="15">15%</option>
-            <option value="20">20%</option>
-            <option value="25">25%</option>
-            <option value="30">30%</option>
-            <option value="40">40%</option>
-            <option value="50">50%</option>
-        </select>
-    </div>
-
-    <button onclick="calculateLeverage()">Calculate</button>
-
-    <div id="result">Result will appear here.</div>
 
     <script>
         function calculateLeverage() {
@@ -100,7 +154,7 @@
 
             if (isNaN(entryPrice) || isNaN(lossPrice)) {
                 resultElement.textContent = "Please enter both entry price and stop-loss price.";
-                resultElement.style.color = "red"; // Highlight error messages
+                resultElement.style.color = "red";
                 return;
             }
 
@@ -116,10 +170,10 @@
 
             if (leverage > 0) {
                 resultElement.textContent = `Result: ${leverage.toFixed(2)}x.`;
-                resultElement.style.color = "#333"; // Normal text color
+                resultElement.style.color = "#333";
             } else {
                 resultElement.textContent = "Unable to calculate leverage. Please check your values.";
-                resultElement.style.color = "red"; // Highlight error messages
+                resultElement.style.color = "red";
             }
         }
     </script>
