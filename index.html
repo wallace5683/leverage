@@ -158,6 +158,20 @@
                 return;
             }
 
+            // Long Position Validation
+            if (position === "long" && lossPrice >= entryPrice) {
+                resultElement.textContent = "For Long Position, Stop-Loss Price must be LOWER than Entry Price.";
+                resultElement.style.color = "red";
+                return;
+            }
+
+            // Short Position Validation
+            if (position === "short" && lossPrice <= entryPrice) {
+                resultElement.textContent = "For Short Position, Stop-Loss Price must be HIGHER than Entry Price.";
+                resultElement.style.color = "red";
+                return;
+            }
+
             let leverage;
 
             if (position === "long") {
