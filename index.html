@@ -164,19 +164,19 @@
             const resultElement = document.getElementById("result");
 
             if (isNaN(entryPrice) || isNaN(lossPrice)) {
-                resultElement.textContent = "Please enter both entry price and stop-loss price.";
+                resultElement.textContent = "Please enter both Entry Price and Loss Cut Price.";
                 resultElement.style.color = "red";
                 return;
             }
 
             if (position === "long" && lossPrice >= entryPrice) {
-                resultElement.textContent = "For Long Position, Stop-Loss Price must be LOWER than Entry Price.";
+                resultElement.textContent = "For Long Position, Loss Cut Price must be LOWER than Entry Price.";
                 resultElement.style.color = "red";
                 return;
             }
 
             if (position === "short" && lossPrice <= entryPrice) {
-                resultElement.textContent = "For Short Position, Stop-Loss Price must be HIGHER than Entry Price.";
+                resultElement.textContent = "For Short Position, Loss Cut Price must be HIGHER than Entry Price.";
                 resultElement.style.color = "red";
                 return;
             }
@@ -196,9 +196,9 @@
 
             if (leverage > 0) {
                 resultElement.innerHTML = `
-                    <div>Result: <strong>${leverage.toFixed(2)}x</strong></div>
+                    <div>Result: <strong>${leverage.toFixed(2).toLocaleString()}</strong>x</div>
                     <div style="margin-top: 15px;">Half TP:</div>
-                    <div><strong>${halfTakeProfit.toFixed(2)}</strong></div>
+                    <div><strong>${halfTakeProfit.toFixed(2).toLocaleString()}</strong></div>
                 `;
                 resultElement.style.color = "#333";
             } else {
