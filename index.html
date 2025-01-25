@@ -94,7 +94,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-direction: column; /* 결과값 여러 줄 출력 */
+            flex-direction: column;
         }
         @media (max-width: 375px) {
             body {
@@ -127,12 +127,12 @@
 
         <div class="row">
             <label for="entryPrice">Entry Price:</label>
-            <input type="number" id="entryPrice" placeholder="Enter entry price" inputmode="decimal">
+            <input type="text" id="entryPrice" placeholder="Enter entry price" oninput="formatInput(this)" inputmode="decimal">
         </div>
 
         <div class="row">
             <label for="lossPrice">Loss Cut Price:</label>
-            <input type="number" id="lossPrice" placeholder="Enter stop-loss price" inputmode="decimal">
+            <input type="text" id="lossPrice" placeholder="Enter stop-loss price" oninput="formatInput(this)" inputmode="decimal">
         </div>
 
         <div class="row">
@@ -155,28 +155,41 @@
     </div>
 
     <script>
+        function formatInput(input) {
+            // 숫자를 포맷팅하여 입력 필드에 표시
+            const value = input.value.replace(/,/g, ''); // 기존 콤마 제거
+            if (!isNaN(value) && value.trim() !== '') {
+                input.value = parseFloat(value).toLocaleString(); // 숫자에 콤마 추가
+            }
+        }
+
+        function parseFormattedNumber(value) {
+            // 콤마를 제거하고 숫자로 변환
+            return parseFloat(value.replace(/,/g, ''));
+        }
+
         function calculateLeverage() {
             const position = document.getElementById("position").value;
-            const entryPrice = parseFloat(document.getElementById("entryPrice").value);
-            const lossPrice = parseFloat(document.getElementById("lossPrice").value);
+            const entryPrice = parseFormattedNumber(document.getElementById("entryPrice").value);
+            const lossPrice = parseFormattedNumber(document.getElementById("lossPrice").value);
             const coverPercent = parseFloat(document.getElementById("coverPercent").value);
 
             const resultElement = document.getElementById("result");
 
             if (isNaN(entryPrice) || isNaN(lossPrice)) {
-                resultElement.textContent = "Please enter both Entry Price and Loss Cut Price.";
+                resultElement.textContent = "Please enter both entry price and stop-loss price.";
                 resultElement.style.color = "red";
                 return;
             }
 
             if (position === "long" && lossPrice >= entryPrice) {
-                resultElement.textContent = "For Long Position, Loss Cut Price must be LOWER than Entry Price.";
+                resultElement.textContent = "For Long Position, Stop-Loss Price must be LOWER than Entry Price.";
                 resultElement.style.color = "red";
                 return;
             }
 
             if (position === "short" && lossPrice <= entryPrice) {
-                resultElement.textContent = "For Short Position, Loss Cut Price must be HIGHER than Entry Price.";
+                resultElement.textContent = "For Short Position, Stop-Loss Price must be HIGHER than Entry Price.";
                 resultElement.style.color = "red";
                 return;
             }
@@ -196,7 +209,7 @@
 
             if (leverage > 0) {
                 resultElement.innerHTML = `
-                    <div>Result: <strong>${leverage.toFixed(2).toLocaleString()}</strong>x</div>
+                    <div>Result: <strong>${leverage.toFixed(2)}</strong>x</div>
                     <div style="margin-top: 15px;">Half TP:</div>
                     <div><strong>${halfTakeProfit.toFixed(2).toLocaleString()}</strong></div>
                 `;
