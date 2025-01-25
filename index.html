@@ -1,3 +1,6 @@
+다음은 메뉴는 영어로, 결과도 영어로 표현한 전체 코드입니다:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -100,7 +103,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>본절 유지 레버리지 Check</h1>
+        <h1>Position Maintenance Check</h1>
 
         <div class="row">
             <label for="position">Position:</label>
@@ -159,9 +162,9 @@
 
             const resultElement = document.getElementById("result");
 
-            // 입력 검증
+            // Input validation
             if (isNaN(entryPrice) || isNaN(lossCutPrice)) {
-                resultElement.textContent = "가격을 입력해주세요.";
+                resultElement.textContent = "Please enter both entry price and loss cut price.";
                 resultElement.style.color = "red";
                 return;
             }
@@ -170,8 +173,8 @@
             if ((position === "long" && lossCutPrice >= entryPrice) ||
                 (position === "short" && lossCutPrice <= entryPrice)) {
                 resultElement.textContent = position === "long" 
-                    ? "Long 포지션은 손절 가격이 진입 가격보다 낮아야 합니다."
-                    : "Short 포지션은 손절 가격이 진입 가격보다 높아야 합니다.";
+                    ? "For Long Position, Loss Cut Price must be LOWER than Entry Price."
+                    : "For Short Position, Loss Cut Price must be HIGHER than Entry Price.";
                 resultElement.style.color = "red";
                 return;
             }
@@ -180,7 +183,7 @@
             const lossPercent = Math.abs((entryPrice - lossCutPrice) / entryPrice) * 100;
             const leverage = coverPercent / lossPercent;
 
-            // 본절 유지를 위한 Half TP 계산
+            // Maintenance Half TP calculation
             let halfTakeProfit;
             if (position === "long") {
                 halfTakeProfit = entryPrice + (riskAmount / 2);
@@ -190,10 +193,12 @@
 
             resultElement.innerHTML = `
                 <div>Leverage: <strong>${leverage.toFixed(2)}x</strong></div>
-                <div>본절 유지 Half TP: <strong>${halfTakeProfit.toLocaleString()}</strong></div>
+                <div>Maintenance Half TP: <strong>${halfTakeProfit.toLocaleString()}</strong></div>
             `;
             resultElement.style.color = "#333";
         }
     </script>
 </body>
 </html>
+
+```
