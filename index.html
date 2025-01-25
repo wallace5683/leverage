@@ -36,44 +36,47 @@
             text-align: center;
             color: #333;
             margin: 0 0 25px;
-            font-size: 24px; /* 제목 글씨 크기를 살짝 키움 */
+            font-size: 24px;
             font-weight: bold;
             border-bottom: 1px solid #e0e0e0;
         }
         .row {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
         }
         label {
-            margin-bottom: 8px;
             font-size: 16px;
             font-weight: 600;
             color: #333;
         }
-        input, select, button {
-            width: 100%;
+        select, input {
             padding: 12px;
             font-size: 16px;
             border: 1.5px solid #e0e0e0;
             border-radius: 8px;
-            appearance: none;
-            -webkit-appearance: none;
             background-color: #f9f9f9;
+            flex: 1;
+            margin-left: 10px;
         }
-        input:focus, select:focus, button:focus {
+        select:focus, input:focus {
             outline: none;
             border-color: #007BFF;
             box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
         }
         button {
             margin-top: 15px;
+            width: 100%;
+            padding: 12px;
             background-color: #007BFF;
             color: white;
+            font-size: 16px;
             font-weight: bold;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            border: none;
         }
         button:hover {
             background-color: #0056b3;
@@ -95,6 +98,20 @@
             align-items: center;
             justify-content: center;
         }
+        .inline-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        .inline-group label {
+            font-weight: bold;
+            margin: 0;
+        }
+        select {
+            flex: 1;
+        }
         @media (max-width: 375px) {
             body {
                 padding: 20px;
@@ -105,7 +122,7 @@
             h1 {
                 font-size: 22px;
             }
-            input, select, button {
+            select, input, button {
                 font-size: 14px;
                 padding: 10px;
             }
@@ -116,11 +133,23 @@
     <div class="container">
         <h1>Leverage Calculator</h1>
 
-        <div class="row">
+        <div class="inline-group">
             <label for="position">Position:</label>
             <select id="position">
                 <option value="long">Long</option>
                 <option value="short">Short</option>
+            </select>
+
+            <label for="coverPercent">Coverable %:</label>
+            <select id="coverPercent">
+                <option value="5">5%</option>
+                <option value="10">10%</option>
+                <option value="15">15%</option>
+                <option value="20">20%</option>
+                <option value="25" selected>25%</option> <!-- 25% 기본값 설정 -->
+                <option value="30">30%</option>
+                <option value="40">40%</option>
+                <option value="50">50%</option>
             </select>
         </div>
 
@@ -132,20 +161,6 @@
         <div class="row">
             <label for="lossPrice">Stop-Loss Price:</label>
             <input type="number" id="lossPrice" placeholder="Enter stop-loss price" inputmode="decimal">
-        </div>
-
-        <div class="row">
-            <label for="coverPercent">Coverable Percentage (%):</label>
-            <select id="coverPercent">
-                <option value="5">5%</option> <!-- 5% 옵션 추가 -->
-                <option value="10">10%</option>
-                <option value="15">15%</option>
-                <option value="20">20%</option>
-                <option value="25">25%</option>
-                <option value="30">30%</option>
-                <option value="40">40%</option>
-                <option value="50">50%</option>
-            </select>
         </div>
 
         <button onclick="calculateLeverage()">Calculate</button>
