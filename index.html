@@ -101,7 +101,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>☑️ LVG. Check</h1>
+        <h1>본절 유지 레버리지 Check</h1>
 
         <div class="row">
             <label for="position">Position:</label>
@@ -135,7 +135,7 @@
             </select>
         </div>
 
-        <button onclick="calculateLeverage()">Calculate</button>
+        <button onclick="calculateMaintenanceTP()">Calculate</button>
 
         <div id="result">Result will appear here.</div>
     </div>
@@ -152,7 +152,7 @@
             return parseFloat(value.replace(/,/g, '')); 
         }
 
-        function calculateLeverage() {
+        function calculateMaintenanceTP() {
             const position = document.getElementById("position").value;
             const entryPrice = parseFormattedNumber(document.getElementById("entryPrice").value);
             const lossCutPrice = parseFormattedNumber(document.getElementById("lossCutPrice").value);
@@ -160,9 +160,9 @@
 
             const resultElement = document.getElementById("result");
 
-            // Input validation
+            // 입력 검증
             if (isNaN(entryPrice) || isNaN(lossCutPrice)) {
-                resultElement.textContent = "Please enter both entry price and loss cut price.";
+                resultElement.textContent = "가격을 입력해주세요.";
                 resultElement.style.color = "red";
                 return;
             }
@@ -171,8 +171,8 @@
             if ((position === "long" && lossCutPrice >= entryPrice) ||
                 (position === "short" && lossCutPrice <= entryPrice)) {
                 resultElement.textContent = position === "long" 
-                    ? "For Long Position, Loss Cut Price must be LOWER than Entry Price."
-                    : "For Short Position, Loss Cut Price must be HIGHER than Entry Price.";
+                    ? "Long 포지션은 손절 가격이 진입 가격보다 낮아야 합니다."
+                    : "Short 포지션은 손절 가격이 진입 가격보다 높아야 합니다.";
                 resultElement.style.color = "red";
                 return;
             }
@@ -181,33 +181,19 @@
             const lossPercent = Math.abs((entryPrice - lossCutPrice) / entryPrice) * 100;
             const leverage = coverPercent / lossPercent;
 
-            // Half TP calculation to maintain original position
+            // 본절 유지를 위한 Half TP 계산
             let halfTakeProfit;
-            let halfPositionGain;
-            let remainingLoss;
-
             if (position === "long") {
-                // Calculate half TP that ensures no net loss
-                halfTakeProfit = entryPrice + ((leverage * riskAmount) / 2);
-                halfPositionGain = halfTakeProfit - entryPrice;
-                remainingLoss = riskAmount / 2;
+                halfTakeProfit = entryPrice + (riskAmount / 2);
             } else {
-                // Short position calculation
-                halfTakeProfit = entryPrice - ((leverage * riskAmount) / 2);
-                halfPositionGain = entryPrice - halfTakeProfit;
-                remainingLoss = riskAmount / 2;
+                halfTakeProfit = entryPrice - (riskAmount / 2);
             }
 
-            const netResult = halfPositionGain - remainingLoss;
-
             resultElement.innerHTML = `
-                <div>Leverage: <strong>${leverage.toFixed(2)}</strong>x</div>
-                <div>Half TP: <strong>${halfTakeProfit.toLocaleString()}</strong></div>
-                <div>Half Position Gain: <strong>${halfPositionGain.toLocaleString()}</strong></div>
-                <div>Remaining Position Loss: <strong>${remainingLoss.toLocaleString()}</strong></div>
-                <div>Net Result: <strong>${netResult.toLocaleString()}</strong></div>
+                <div>Leverage: <strong>${leverage.toFixed(2)}x</strong></div>
+                <div>본절 유지 Half TP: <strong>${halfTakeProfit.toLocaleString()}</strong></div>
             `;
-            resultElement.style.color = netResult >= 0 ? "green" : "red";
+            resultElement.style.color = "#333";
         }
     </script>
 </body>
