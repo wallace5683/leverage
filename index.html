@@ -214,8 +214,9 @@
 
             resultElement.innerHTML = `
                 <div>Leverage: <strong>${leverage.toFixed(2)}x</strong></div>
-                <div>Half TP (Fee Included): <strong>${halfTakeProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong></div>
-                <div>Estimated Fee: <strong>${feeAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong></div>
+                <div>Half TP: <strong>${halfTakeProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong></div>
+                <div>Fee Percent: <strong>${fees.taker}%</strong> (Taker), <strong>${fees.maker}%</strong> (Maker)</div>
+                <div>Estimated Fee: <strong>${feeAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} (${fees.taker}%)</strong></div>
             `;
             resultElement.style.color = "#333";
         }
