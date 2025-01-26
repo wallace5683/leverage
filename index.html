@@ -201,7 +201,7 @@
 
             resultElement.innerHTML = `
                 <div>Leverage: <strong>${leverage.toFixed(2)}x</strong></div>
-                <div>Half TP: <strong>${halfTakeProfit.toFixed(2).toLocaleString()}</strong></div>
+                <div>Half TP: <strong>${halfTakeProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></div>
             `;
             resultElement.style.color = "#333";
         }
