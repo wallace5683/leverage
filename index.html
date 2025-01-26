@@ -112,7 +112,7 @@
 
         <div class="row">
             <label for="entryPrice">Entry Price:</label>
-            <input type="text" id="entryPrice" placeholder="Enter entry price" 
+            <input type="text" id="entryPrice" placeholder="Enter Entry Price" 
                    oninput="formatInput(this)" 
                    onblur="formatOnBlur(this)" 
                    inputmode="decimal">
@@ -120,7 +120,7 @@
 
         <div class="row">
             <label for="lossCutPrice">Loss Cut Price:</label>
-            <input type="text" id="lossCutPrice" placeholder="Enter loss cut price" 
+            <input type="text" id="lossCutPrice" placeholder="Enter Loss Cut Price" 
                    oninput="formatInput(this)" 
                    onblur="formatOnBlur(this)" 
                    inputmode="decimal">
@@ -183,7 +183,7 @@
             const resultElement = document.getElementById("result");
 
             if (isNaN(entryPrice) || isNaN(lossCutPrice)) {
-                resultElement.textContent = "Please fill out all required fields.";
+                resultElement.textContent = "Please fill out All Required Fields.";
                 resultElement.style.color = "red";
                 return;
             }
