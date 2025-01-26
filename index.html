@@ -100,7 +100,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>☑️ LVG. Check</h1>
+        <h1>☑️LVG. Check</h1>
 
         <div class="row">
             <label for="position">Position:</label>
@@ -112,7 +112,7 @@
 
         <div class="row">
             <label for="entryPrice">Entry Price:</label>
-            <input type="text" id="entryPrice" placeholder="Enter Entry Price" 
+            <input type="text" id="entryPrice" placeholder="Enter entry price" 
                    oninput="formatInput(this)" 
                    onblur="formatOnBlur(this)" 
                    inputmode="decimal">
@@ -120,7 +120,7 @@
 
         <div class="row">
             <label for="lossCutPrice">Loss Cut Price:</label>
-            <input type="text" id="lossCutPrice" placeholder="Enter Loss Cut Price" 
+            <input type="text" id="lossCutPrice" placeholder="Enter loss cut price" 
                    oninput="formatInput(this)" 
                    onblur="formatOnBlur(this)" 
                    inputmode="decimal">
@@ -140,18 +140,30 @@
             </select>
         </div>
 
+        <div class="row">
+            <label for="leverage">Leverage:</label>
+            <input type="number" id="leverage" placeholder="Enter leverage (e.g., 10)" min="1" step="1">
+        </div>
+
         <button onclick="calculateMaintenanceTP()">Calculate</button>
 
         <div id="result">Result will appear here.</div>
     </div>
 
     <script>
+        // 수수료 테이블 정의 (레버리지별 메이커/테이커 수수료)
+        const feeTable = {
+            1: { maker: 0.02, taker: 0.04 },
+            5: { maker: 0.03, taker: 0.05 },
+            10: { maker: 0.04, taker: 0.06 },
+            20: { maker: 0.05, taker: 0.07 },
+            50: { maker: 0.08, taker: 0.1 },
+        };
+
         function formatInput(input) {
-            let value = input.value.replace(/,/g, ''); // ',' 제거
-            if (isNaN(value)) {
-                return; // 숫자가 아니면 포맷하지 않음
-            }
-            input.dataset.rawValue = value; // 입력값을 별도로 저장
+            let value = input.value.replace(/,/g, '');
+            if (isNaN(value)) return;
+            input.dataset.rawValue = value;
         }
 
         function formatOnBlur(input) {
@@ -165,7 +177,7 @@
         }
 
         function parseFormattedNumber(value) {
-            return parseFloat(value.replace(/,/g, '')); 
+            return parseFloat(value.replace(/,/g, ''));
         }
 
         function calculateMaintenanceTP() {
@@ -173,11 +185,12 @@
             const entryPrice = parseFormattedNumber(document.getElementById("entryPrice").value);
             const lossCutPrice = parseFormattedNumber(document.getElementById("lossCutPrice").value);
             const coverPercent = parseFloat(document.getElementById("coverPercent").value);
+            const leverage = parseFloat(document.getElementById("leverage").value);
 
             const resultElement = document.getElementById("result");
 
-            if (isNaN(entryPrice) || isNaN(lossCutPrice)) {
-                resultElement.textContent = "Please enter both Entry Price & Loss Cut Price.";
+            if (isNaN(entryPrice) || isNaN(lossCutPrice) || isNaN(leverage)) {
+                resultElement.textContent = "Please fill out all required fields.";
                 resultElement.style.color = "red";
                 return;
             }
@@ -193,15 +206,21 @@
 
             const riskAmount = Math.abs(entryPrice - lossCutPrice);
             const lossPercent = Math.abs((entryPrice - lossCutPrice) / entryPrice) * 100;
-            const leverage = coverPercent / lossPercent;
+            const leverageMultiplier = coverPercent / lossPercent;
+
+            const fee = feeTable[leverage] || feeTable[Object.keys(feeTable).pop()];
+            const makerFee = (entryPrice * fee.maker) / 100;
+            const takerFee = (lossCutPrice * fee.taker) / 100;
+            const totalFee = makerFee + takerFee;
 
             let halfTakeProfit = position === "long" 
-                ? entryPrice + riskAmount 
-                : entryPrice - riskAmount;
+                ? entryPrice + riskAmount + totalFee
+                : entryPrice - riskAmount - totalFee;
 
             resultElement.innerHTML = `
-                <div>Leverage: <strong>${leverage.toFixed(2)}x</strong></div>
-                <div>Half TP: <strong>${halfTakeProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></div>
+                <div>Leverage: <strong>${leverageMultiplier.toFixed(2)}x</strong></div>
+                <div>Half TP (with Fee): <strong>${halfTakeProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></div>
+                <div>Total Fees: <strong>${totalFee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></div>
             `;
             resultElement.style.color = "#333";
         }
