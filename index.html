@@ -143,7 +143,7 @@
         function formatInput(input) {
             const value = input.value.replace(/,/g, ''); 
             if (!isNaN(value) && value.trim() !== '') {
-                input.value = parseFloat(value).toLocaleString(); 
+                input.value = parseFloat(value).toFixed(2).toLocaleString(); 
             }
         }
 
@@ -159,14 +159,12 @@
 
             const resultElement = document.getElementById("result");
 
-            // Input validation
             if (isNaN(entryPrice) || isNaN(lossCutPrice)) {
                 resultElement.textContent = "Please enter both entry price and loss cut price.";
                 resultElement.style.color = "red";
                 return;
             }
 
-            // Position-specific validation
             if ((position === "long" && lossCutPrice >= entryPrice) ||
                 (position === "short" && lossCutPrice <= entryPrice)) {
                 resultElement.textContent = position === "long" 
@@ -180,14 +178,13 @@
             const lossPercent = Math.abs((entryPrice - lossCutPrice) / entryPrice) * 100;
             const leverage = coverPercent / lossPercent;
 
-            // Half TP calculation (exactly as you described)
             let halfTakeProfit = position === "long" 
                 ? entryPrice + riskAmount 
                 : entryPrice - riskAmount;
 
             resultElement.innerHTML = `
                 <div>Leverage: <strong>${leverage.toFixed(2)}x</strong></div>
-                <div>Half TP: <strong>${halfTakeProfit.toLocaleString()}</strong></div>
+                <div>Half TP: <strong>${halfTakeProfit.toFixed(2).toLocaleString()}</strong></div>
             `;
             resultElement.style.color = "#333";
         }
