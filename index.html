@@ -85,7 +85,7 @@
             margin-top: 15px;
             font-size: 18px;
             font-weight: bold;
-            text-align: center;
+            text-align: left;
             color: #333;
             background-color: #f0f0f0;
             padding: 15px;
@@ -100,7 +100,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>✔️ LVG. Check</h1>
+        <h1>✔☑️ LVG. Check</h1>
 
         <div class="row">
             <label for="position">🔍Position:</label>
@@ -213,9 +213,9 @@
                 : entryPrice - riskAmount - feeAmount;
 
             resultElement.innerHTML = `
-                <div>💊Leverage: <strong>x ${leverage.toFixed(2)}</strong></div>
-                <div>⚖️Half TP: <strong>${halfTakeProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong></div>
-                <div>🧾Est. Fee: <strong>${feeAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} (${fees.taker}%)</strong></div>
+                <div>⏫Leverage: <strong>x ${leverage.toFixed(2)}</strong></div>
+                <div>⏏️Half TP: <strong>${halfTakeProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong></div>
+                <div>*️⃣Est. Fee: <strong>${feeAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} (${fees.taker}%)</strong></div>
             `;
             resultElement.style.color = "#333";
         }
