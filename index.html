@@ -100,7 +100,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>☑️ LVG. Check</h1>
+        <h1>☑️LVG. Check</h1>
 
         <div class="row">
             <label for="position">Position:</label>
@@ -141,9 +141,12 @@
 
     <script>
         function formatInput(input) {
-            const value = input.value.replace(/,/g, ''); 
+            let value = input.value.replace(/,/g, ''); // ',' 제거
             if (!isNaN(value) && value.trim() !== '') {
-                input.value = parseFloat(value).toFixed(2).toLocaleString(); 
+                input.value = Number(value).toLocaleString(undefined, {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2,
+                }); // 최소 0자리, 최대 2자리 소수
             }
         }
 
@@ -160,7 +163,7 @@
             const resultElement = document.getElementById("result");
 
             if (isNaN(entryPrice) || isNaN(lossCutPrice)) {
-                resultElement.textContent = "Please enter both Entry Price and Loss Cut Price.";
+                resultElement.textContent = "Please enter both entry price and loss cut price.";
                 resultElement.style.color = "red";
                 return;
             }
