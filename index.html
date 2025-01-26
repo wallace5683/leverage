@@ -103,7 +103,7 @@
         <h1>✔️ LVG. Check</h1>
 
         <div class="row">
-            <label for="position">🚦Position:</label>
+            <label for="position">🔍Position:</label>
             <select id="position">
                 <option value="long">📈Long</option>
                 <option value="short">📉Short</option>
@@ -140,7 +140,7 @@
             </select>
         </div>
 
-        <button onclick="calculateMaintenanceTP()">🧮Calculate</button>
+        <button onclick="calculateMaintenanceTP()">💡Calculate</button>
 
         <div id="result">Result will appear here...</div>
     </div>
@@ -213,9 +213,9 @@
                 : entryPrice - riskAmount - feeAmount;
 
             resultElement.innerHTML = `
-                <div>💊Leverage: <strong>x${leverage.toFixed(2)}</strong></div>
+                <div>💊Leverage: <strong>x ${leverage.toFixed(2)}</strong></div>
                 <div>⚖️Half TP: <strong>${halfTakeProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong></div>
-                <div>📨Est. Fee: <strong>${feeAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} (${fees.taker}%)</strong></div>
+                <div>🧾Est. Fee: <strong>${feeAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} (${fees.taker}%)</strong></div>
             `;
             resultElement.style.color = "#333";
         }
