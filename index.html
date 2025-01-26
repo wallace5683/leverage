@@ -100,10 +100,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>☑️ LVG. Check</h1>
+        <h1>✔️ LVG. Check</h1>
 
         <div class="row">
-            <label for="position">Position:</label>
+            <label for="position">🚦Position:</label>
             <select id="position">
                 <option value="long">📈Long</option>
                 <option value="short">📉Short</option>
@@ -111,7 +111,7 @@
         </div>
 
         <div class="row">
-            <label for="entryPrice">Entry Price:</label>
+            <label for="entryPrice">💵Entry Price:</label>
             <input type="text" id="entryPrice" placeholder="Enter Entry Price" 
                    oninput="formatInput(this)" 
                    onblur="formatOnBlur(this)" 
@@ -119,7 +119,7 @@
         </div>
 
         <div class="row">
-            <label for="lossCutPrice">Loss Cut Price:</label>
+            <label for="lossCutPrice">💸Loss Cut Price:</label>
             <input type="text" id="lossCutPrice" placeholder="Enter Loss Cut Price" 
                    oninput="formatInput(this)" 
                    onblur="formatOnBlur(this)" 
@@ -127,7 +127,7 @@
         </div>
 
         <div class="row">
-            <label for="coverPercent">Coverable Percentage(%):</label>
+            <label for="coverPercent">☂️Coverable Percentage(%):</label>
             <select id="coverPercent">
                 <option value="5">5%</option>
                 <option value="10">10%</option>
@@ -140,9 +140,9 @@
             </select>
         </div>
 
-        <button onclick="calculateMaintenanceTP()">Calculate</button>
+        <button onclick="calculateMaintenanceTP()">🧮Calculate</button>
 
-        <div id="result">Result will appear here.</div>
+        <div id="result">Result will appear here...</div>
     </div>
 
     <script>
@@ -213,9 +213,9 @@
                 : entryPrice - riskAmount - feeAmount;
 
             resultElement.innerHTML = `
-                <div>Leverage: <strong>${leverage.toFixed(2)}x</strong></div>
-                <div>Half TP: <strong>${halfTakeProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong></div>
-                <div>Est. Fee: <strong>${feeAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} (${fees.taker}%)</strong></div>
+                <div>💊Leverage: <strong>x${leverage.toFixed(2)}</strong></div>
+                <div>⚖️Half TP: <strong>${halfTakeProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong></div>
+                <div>📨Est. Fee: <strong>${feeAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} (${fees.taker}%)</strong></div>
             `;
             resultElement.style.color = "#333";
         }
