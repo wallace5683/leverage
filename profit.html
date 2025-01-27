@@ -2,130 +2,171 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Profit Calculator</title>
     <style>
         * {
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 30px;
             background-color: #f4f4f4;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
         }
         .container {
-            background: #fff;
-            padding: 20px;
+            background-color: white;
             border-radius: 12px;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
+            padding: 20px;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.15);
             width: 100%;
+            max-width: 500px;
         }
         h1 {
+            position: sticky;
+            top: 0;
+            background-color: white;
+            padding: 10px 0;
+            z-index: 10;
             text-align: center;
-            font-size: 24px;
-            margin-bottom: 20px;
             color: #333;
+            margin: 0 0 25px;
+            font-size: 24px;
+            font-weight: bold;
+            border-bottom: 1px solid #e0e0e0;
         }
         .row {
-            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
         }
         label {
-            font-size: 14px;
-            color: #555;
-            display: block;
-            margin-bottom: 5px;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
+            margin-bottom: 8px;
             font-size: 16px;
-            border: 1px solid #ddd;
+            font-weight: 600;
+            color: #333;
+        }
+        input, button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1.5px solid #e0e0e0;
             border-radius: 8px;
+            appearance: none;
+            -webkit-appearance: none;
+            background-color: #f9f9f9;
+        }
+        input:focus, button:focus {
+            outline: none;
+            border-color: #007BFF;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
         }
         button {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            background: #007BFF;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
+            margin-top: 15px;
+            background-color: #007BFF;
+            color: white;
+            font-weight: bold;
             cursor: pointer;
-            margin-top: 10px;
+            transition: background-color 0.3s ease;
+            border: none;
         }
         button:hover {
-            background: #0056b3;
+            background-color: #0056b3;
         }
-        .result {
+        button:active {
+            transform: scale(0.98);
+        }
+        #result {
             margin-top: 20px;
-            padding: 10px;
-            background: #f9f9f9;
-            border: 1px solid #ddd;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: left;
+            color: #333;
+            background-color: #f0f0f0;
+            padding: 15px;
             border-radius: 8px;
-            font-size: 14px;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Profit Calculator</h1>
+        <h1>📈 Profit Calculator</h1>
+
         <div class="row">
-            <label for="initialInvestment">Initial Investment ($):</label>
-            <input type="number" id="initialInvestment" placeholder="Enter initial investment">
+            <label for="initialAmount">Initial Investment:</label>
+            <input type="text" id="initialAmount" placeholder="Enter initial amount" oninput="formatInput(this)">
         </div>
+
         <div class="row">
-            <label for="profitPercent">Profit Percentage (% per trade):</label>
-            <input type="number" id="profitPercent" placeholder="Enter profit percentage">
+            <label for="profitPercent">Profit Percentage (%):</label>
+            <input type="text" id="profitPercent" placeholder="Enter profit percentage" oninput="formatInput(this)">
         </div>
+
         <div class="row">
-            <label for="leverage">Leverage (x):</label>
-            <input type="number" id="leverage" placeholder="Enter leverage">
+            <label for="leverage">Leverage:</label>
+            <input type="text" id="leverage" placeholder="Enter leverage" oninput="formatInput(this)">
         </div>
+
         <div class="row">
             <label for="monthlyTrades">Monthly Trades:</label>
-            <input type="number" id="monthlyTrades" placeholder="Enter monthly trades">
+            <input type="text" id="monthlyTrades" placeholder="Enter monthly trade count" oninput="formatInput(this)">
         </div>
+
         <button onclick="calculateProfit()">Calculate</button>
-        <div id="result" class="result"></div>
+
+        <div id="result">Result will appear here.</div>
     </div>
 
     <script>
+        function formatInput(input) {
+            const value = input.value.replace(/,/g, ''); 
+            if (!isNaN(value) && value.trim() !== '') {
+                input.value = parseFloat(value).toLocaleString(); 
+            }
+        }
+
+        function parseFormattedNumber(value) {
+            return parseFloat(value.replace(/,/g, ''));
+        }
+
         function calculateProfit() {
-            // Fetch input values
-            const initialInvestment = parseFloat(document.getElementById("initialInvestment").value);
+            const initialAmount = parseFormattedNumber(document.getElementById("initialAmount").value);
             const profitPercent = parseFloat(document.getElementById("profitPercent").value);
             const leverage = parseFloat(document.getElementById("leverage").value);
-            const monthlyTrades = parseInt(document.getElementById("monthlyTrades").value);
+            const monthlyTrades = parseInt(document.getElementById("monthlyTrades").value, 10);
 
-            const resultDiv = document.getElementById("result");
+            const resultElement = document.getElementById("result");
 
             // Input validation
-            if (isNaN(initialInvestment) || isNaN(profitPercent) || isNaN(leverage) || isNaN(monthlyTrades)) {
-                resultDiv.innerHTML = "<p style='color: red;'>Please fill in all fields correctly.</p>";
+            if (isNaN(initialAmount) || isNaN(profitPercent) || isNaN(leverage) || isNaN(monthlyTrades)) {
+                resultElement.textContent = "Please fill in all fields with valid numbers.";
+                resultElement.style.color = "red";
                 return;
             }
 
-            // Calculations
-            const effectiveProfitPercent = profitPercent * leverage; // Adjusted profit percentage
-            const monthlyProfit = initialInvestment * (effectiveProfitPercent / 100) * monthlyTrades;
-            const monthlyProfitPercent = effectiveProfitPercent * monthlyTrades;
+            const effectiveProfit = profitPercent * leverage / 100;
+            const monthlyProfitPercent = Math.pow(1 + effectiveProfit, monthlyTrades) - 1;
+            const yearlyProfitPercent = Math.pow(1 + monthlyProfitPercent, 12) - 1;
 
-            const yearlyProfit = monthlyProfit * 12;
-            const yearlyProfitPercent = monthlyProfitPercent * 12;
+            const monthlyProfit = initialAmount * monthlyProfitPercent;
+            const yearlyProfit = initialAmount * yearlyProfitPercent;
 
-            // Display results
-            resultDiv.innerHTML = `
-                <p><strong>Monthly Profit:</strong> $${monthlyProfit.toFixed(2)}</p>
-                <p><strong>Monthly Profit (%):</strong> ${monthlyProfitPercent.toFixed(2)}%</p>
-                <p><strong>Yearly Profit:</strong> $${yearlyProfit.toFixed(2)}</p>
-                <p><strong>Yearly Profit (%):</strong> ${yearlyProfitPercent.toFixed(2)}%</p>
+            resultElement.innerHTML = `
+                <div>Monthly Profit: <strong>${monthlyProfit.toFixed(2).toLocaleString()}</strong></div>
+                <div>Monthly Profit %: <strong>${(monthlyProfitPercent * 100).toFixed(2)}%</strong></div>
+                <div>Yearly Profit: <strong>${yearlyProfit.toFixed(2).toLocaleString()}</strong></div>
+                <div>Yearly Profit %: <strong>${(yearlyProfitPercent * 100).toFixed(2)}%</strong></div>
             `;
+            resultElement.style.color = "#333";
         }
     </script>
 </body>
