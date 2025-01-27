@@ -107,7 +107,7 @@
         </div>
 
         <div class="row">
-            <label for="profitPercent">#️⃣ Profit Percentage (%):</label>
+            <label for="profitPercent">#️⃣ Profit Percentage(1 to 10%):</label>
             <select id="profitPercent">
                 <option value="1" selected>1%</option>
                 <option value="2">2%</option>
@@ -123,7 +123,7 @@
         </div>
 
         <div class="row">
-            <label for="leverage">⏫ Leverage:</label>
+            <label for="leverage">⏫ Leverage(1 to 20):</label>
             <select id="leverage">
                 <option value="1">x 1</option>
                 <option value="2">x 2</option>
@@ -149,7 +149,7 @@
         </div>
 
         <div class="row">
-            <label for="monthlyTrades">🔢 Monthly Trades:</label>
+            <label for="monthlyTrades">🔢 Monthly Trades(1 to 20):</label>
             <select id="monthlyTrades">
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -176,7 +176,7 @@
 
         <button onclick="calculateProfit()">☑️ Calculate</button>
 
-        <div id="result">Result will appear here.</div>
+        <div id="result">Result will appear here...</div>
     </div>
 
     <script>
@@ -220,7 +220,7 @@
             const resultElement = document.getElementById("result");
 
             if (isNaN(initialAmount)) {
-                resultElement.textContent = "Please enter a valid initial amount.";
+                resultElement.textContent = "Please enter a Valid Initial Amount.";
                 resultElement.style.color = "red";
                 return;
             }
