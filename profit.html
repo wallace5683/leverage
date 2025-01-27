@@ -102,7 +102,7 @@
         <h1>💵 Profit Calculator</h1>
 
         <div class="row">
-            <label for="initialAmount">▶️ Initial Investment:</label>
+            <label for="initialAmount">▶️ Initial Investment($):</label>
             <input type="text" id="initialAmount" placeholder="Enter initial amount" oninput="formatInput(this)">
         </div>
 
@@ -240,8 +240,8 @@
 
             // 결과값에 콤마와 소수점 둘째자리까지 표시
             resultElement.innerHTML = `
-                <div>💵 Monthly Profit: <strong>${finalMonthlyAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></div>
-                <div>💵 Yearly Profit: <strong>${finalYearlyAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></div>
+                <div>💵 Monthly P($): <strong>${finalMonthlyAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></div>
+                <div>💵 Yearly P($): <strong>${finalYearlyAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></div>
             `;
             resultElement.style.color = "#333";
         }
