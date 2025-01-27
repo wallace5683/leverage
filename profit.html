@@ -125,26 +125,26 @@
         <div class="row">
             <label for="leverage">⏫ Leverage:</label>
             <select id="leverage">
-                <option value="1">1x</option>
-                <option value="2">2x</option>
-                <option value="3">3x</option>
-                <option value="4">4x</option>
-                <option value="5">5x</option>
-                <option value="6">6x</option>
-                <option value="7">7x</option>
-                <option value="8">8x</option>
-                <option value="9">9x</option>
-                <option value="10" selected>10x</option>
-                <option value="11">11x</option>
-                <option value="12">12x</option>
-                <option value="13">13x</option>
-                <option value="14">14x</option>
-                <option value="15">15x</option>
-                <option value="16">16x</option>
-                <option value="17">17x</option>
-                <option value="18">18x</option>
-                <option value="19">19x</option>
-                <option value="20">20x</option>
+                <option value="1">x 1</option>
+                <option value="2">x 2</option>
+                <option value="3">x 3</option>
+                <option value="4">x 4</option>
+                <option value="5">x 5</option>
+                <option value="6">x 6</option>
+                <option value="7">x 7</option>
+                <option value="8">x 8</option>
+                <option value="9">x 9</option>
+                <option value="10" selected>x 10</option>
+                <option value="11">x 11</option>
+                <option value="12">x 12</option>
+                <option value="13">x 13</option>
+                <option value="14">x 14</option>
+                <option value="15">x 15</option>
+                <option value="16">x 16</option>
+                <option value="17">x 17</option>
+                <option value="18">x 18</option>
+                <option value="19">x 19</option>
+                <option value="20">x 20</option>
             </select>
         </div>
 
@@ -183,7 +183,7 @@
         function formatInput(input) {
             const value = input.value.replace(/,/g, ''); 
             if (!isNaN(value) && value.trim() !== '') {
-                input.value = parseFloat(value).toLocaleString(); 
+                input.value = parseFloat(value).toFixed(2).toLocaleString(); 
             }
         }
 
