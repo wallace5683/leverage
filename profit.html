@@ -36,7 +36,7 @@
             text-align: center;
             color: #333;
             margin: 0 0 25px;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             border-bottom: 1px solid #e0e0e0;
         }
@@ -51,7 +51,7 @@
             font-weight: 600;
             color: #333;
         }
-        input, button {
+        input, select, button {
             width: 100%;
             padding: 12px;
             font-size: 16px;
@@ -61,7 +61,7 @@
             -webkit-appearance: none;
             background-color: #f9f9f9;
         }
-        input:focus, button:focus {
+        input:focus, select:focus, button:focus {
             outline: none;
             border-color: #007BFF;
             box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
@@ -108,17 +108,23 @@
 
         <div class="row">
             <label for="profitPercent">#️⃣ Profit Percentage (%):</label>
-            <input type="text" id="profitPercent" placeholder="Enter profit percentage" oninput="formatInput(this)">
+            <select id="profitPercent">
+                ${Array.from({ length: 10 }, (_, i) => `<option value="${i + 1}">${i + 1}%</option>`).join('')}
+            </select>
         </div>
 
         <div class="row">
             <label for="leverage">⏫ Leverage:</label>
-            <input type="text" id="leverage" placeholder="Enter leverage" oninput="formatInput(this)">
+            <select id="leverage">
+                ${Array.from({ length: 25 }, (_, i) => `<option value="${i + 1}">${i + 1}x</option>`).join('')}
+            </select>
         </div>
 
         <div class="row">
             <label for="monthlyTrades">🔢 Monthly Trades:</label>
-            <input type="text" id="monthlyTrades" placeholder="Enter monthly trade count" oninput="formatInput(this)">
+            <select id="monthlyTrades">
+                ${Array.from({ length: 20 }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('')}
+            </select>
         </div>
 
         <button onclick="calculateProfit()">☑️ Calculate</button>
@@ -146,9 +152,8 @@
 
             const resultElement = document.getElementById("result");
 
-            // Input validation
-            if (isNaN(initialAmount) || isNaN(profitPercent) || isNaN(leverage) || isNaN(monthlyTrades)) {
-                resultElement.textContent = "Please fill in all fields with valid numbers.";
+            if (isNaN(initialAmount)) {
+                resultElement.textContent = "Please enter a valid initial amount.";
                 resultElement.style.color = "red";
                 return;
             }
@@ -157,13 +162,13 @@
             const monthlyProfitPercent = Math.pow(1 + effectiveProfit, monthlyTrades) - 1;
             const yearlyProfitPercent = Math.pow(1 + monthlyProfitPercent, 12) - 1;
 
-            const monthlyProfit = initialAmount * monthlyProfitPercent;
-            const yearlyProfit = initialAmount * yearlyProfitPercent;
+            const finalMonthlyAmount = initialAmount * (1 + monthlyProfitPercent);
+            const finalYearlyAmount = initialAmount * (1 + yearlyProfitPercent);
 
             resultElement.innerHTML = `
-                <div>💵 Monthly Profit: <strong>${monthlyProfit.toFixed(2).toLocaleString()}</strong></div>
+                <div>💵 Monthly Profit (with investment): <strong>${finalMonthlyAmount.toFixed(2).toLocaleString()}</strong></div>
                 <div>#️⃣ Monthly Profit %: <strong>${(monthlyProfitPercent * 100).toFixed(2)}%</strong></div>
-                <div>💵 Yearly Profit: <strong>${yearlyProfit.toFixed(2).toLocaleString()}</strong></div>
+                <div>💵 Yearly Profit (with investment): <strong>${finalYearlyAmount.toFixed(2).toLocaleString()}</strong></div>
                 <div>#️⃣ Yearly Profit %: <strong>${(yearlyProfitPercent * 100).toFixed(2)}%</strong></div>
             `;
             resultElement.style.color = "#333";
