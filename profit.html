@@ -181,13 +181,33 @@
 
     <script>
         function formatInput(input) {
-            const value = input.value.replace(/,/g, ''); 
+            // 입력값에서 콤마 제거
+            let value = input.value.replace(/,/g, '');
+            
+            // 마지막 문자가 '.'인 경우 소수점 입력 중으로 간주
+            if (value.endsWith('.')) {
+                input.value = value;
+                return;
+            }
+            
+            // 숫자가 유효하고 빈 문자열이 아닌 경우에만 포맷팅
             if (!isNaN(value) && value.trim() !== '') {
-                input.value = parseFloat(value).toFixed(2).toLocaleString(); 
+                const parts = value.split('.');
+                // 정수 부분에 콤마 추가
+                parts[0] = parseFloat(parts[0]).toLocaleString();
+                
+                // 소수점이 있는 경우
+                if (parts.length > 1) {
+                    // 소수점 이하 값을 원래 길이대로 유지 (최대 2자리)
+                    input.value = parts[0] + '.' + parts[1].slice(0, 2);
+                } else {
+                    input.value = parts[0];
+                }
             }
         }
 
         function parseFormattedNumber(value) {
+            // 콤마 제거 후 숫자로 변환
             return parseFloat(value.replace(/,/g, ''));
         }
 
@@ -212,11 +232,18 @@
             const finalMonthlyAmount = initialAmount * (1 + monthlyProfitPercent);
             const finalYearlyAmount = initialAmount * (1 + yearlyProfitPercent);
 
+            // 월간 수익률 계산 (원금 포함)
+            const monthlyProfitPercentWithInitial = ((finalMonthlyAmount - initialAmount) / initialAmount * 100);
+            
+            // 연간 수익률 계산 (원금 포함)
+            const yearlyProfitPercentWithInitial = ((finalYearlyAmount - initialAmount) / initialAmount * 100);
+
+            // 결과값에 콤마와 소수점 둘째자리까지 표시
             resultElement.innerHTML = `
-                <div>💵 Monthly Profit (with investment): <strong>${finalMonthlyAmount.toFixed(2).toLocaleString()}</strong></div>
-                <div>#️⃣ Monthly Profit %: <strong>${(monthlyProfitPercent * 100).toFixed(2)}%</strong></div>
-                <div>💵 Yearly Profit (with investment): <strong>${finalYearlyAmount.toFixed(2).toLocaleString()}</strong></div>
-                <div>#️⃣ Yearly Profit %: <strong>${(yearlyProfitPercent * 100).toFixed(2)}%</strong></div>
+                <div>💵 Monthly Profit (with investment): <strong>${finalMonthlyAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></div>
+                <div>#️⃣ Monthly Profit %: <strong>${monthlyProfitPercentWithInitial.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}%</strong></div>
+                <div>💵 Yearly Profit (with investment): <strong>${finalYearlyAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></div>
+                <div>#️⃣ Yearly Profit %: <strong>${yearlyProfitPercentWithInitial.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}%</strong></div>
             `;
             resultElement.style.color = "#333";
         }
