@@ -102,26 +102,26 @@
         <h1>📈 Profit Calculator</h1>
 
         <div class="row">
-            <label for="initialAmount">Initial Investment:</label>
+            <label for="initialAmount">▶️ Initial Investment:</label>
             <input type="text" id="initialAmount" placeholder="Enter initial amount" oninput="formatInput(this)">
         </div>
 
         <div class="row">
-            <label for="profitPercent">Profit Percentage (%):</label>
+            <label for="profitPercent">#️⃣ Profit Percentage (%):</label>
             <input type="text" id="profitPercent" placeholder="Enter profit percentage" oninput="formatInput(this)">
         </div>
 
         <div class="row">
-            <label for="leverage">Leverage:</label>
+            <label for="leverage">⏫ Leverage:</label>
             <input type="text" id="leverage" placeholder="Enter leverage" oninput="formatInput(this)">
         </div>
 
         <div class="row">
-            <label for="monthlyTrades">Monthly Trades:</label>
+            <label for="monthlyTrades">🔢 Monthly Trades:</label>
             <input type="text" id="monthlyTrades" placeholder="Enter monthly trade count" oninput="formatInput(this)">
         </div>
 
-        <button onclick="calculateProfit()">Calculate</button>
+        <button onclick="calculateProfit()">☑️ Calculate</button>
 
         <div id="result">Result will appear here.</div>
     </div>
@@ -161,10 +161,10 @@
             const yearlyProfit = initialAmount * yearlyProfitPercent;
 
             resultElement.innerHTML = `
-                <div>Monthly Profit: <strong>${monthlyProfit.toFixed(2).toLocaleString()}</strong></div>
-                <div>Monthly Profit %: <strong>${(monthlyProfitPercent * 100).toFixed(2)}%</strong></div>
-                <div>Yearly Profit: <strong>${yearlyProfit.toFixed(2).toLocaleString()}</strong></div>
-                <div>Yearly Profit %: <strong>${(yearlyProfitPercent * 100).toFixed(2)}%</strong></div>
+                <div>💵 Monthly Profit: <strong>${monthlyProfit.toFixed(2).toLocaleString()}</strong></div>
+                <div>#️⃣ Monthly Profit %: <strong>${(monthlyProfitPercent * 100).toFixed(2)}%</strong></div>
+                <div>💵 Yearly Profit: <strong>${yearlyProfit.toFixed(2).toLocaleString()}</strong></div>
+                <div>#️⃣ Yearly Profit %: <strong>${(yearlyProfitPercent * 100).toFixed(2)}%</strong></div>
             `;
             resultElement.style.color = "#333";
         }
