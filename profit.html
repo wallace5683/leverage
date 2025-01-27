@@ -109,9 +109,9 @@
         <div class="row">
             <label for="profitPercent">#️⃣ Profit Percentage (%):</label>
             <select id="profitPercent">
-                <option value="1">1%</option>
+                <option value="1" selected>1%</option>
                 <option value="2">2%</option>
-                <option value="3" selected>3%</option>
+                <option value="3">3%</option>
                 <option value="4">4%</option>
                 <option value="5">5%</option>
                 <option value="6">6%</option>
@@ -158,9 +158,9 @@
                 <option value="5">5</option>
                 <option value="6">6</option>
                 <option value="7">7</option>
-                <option value="8">8</option>
+                <option value="8" selected>8</option>
                 <option value="9">9</option>
-                <option value="10" selected>10</option>
+                <option value="10">10</option>
                 <option value="11">11</option>
                 <option value="12">12</option>
                 <option value="13">13</option>
@@ -240,9 +240,9 @@
 
             // 결과값에 콤마와 소수점 둘째자리까지 표시
             resultElement.innerHTML = `
-                <div>💵 Monthly Profit (with investment): <strong>${finalMonthlyAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></div>
+                <div>💵 Monthly Profit: <strong>${finalMonthlyAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></div>
                 <div>#️⃣ Monthly Profit %: <strong>${monthlyProfitPercentWithInitial.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}%</strong></div>
-                <div>💵 Yearly Profit (with investment): <strong>${finalYearlyAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></div>
+                <div>💵 Yearly Profit: <strong>${finalYearlyAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></div>
                 <div>#️⃣ Yearly Profit %: <strong>${yearlyProfitPercentWithInitial.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}%</strong></div>
             `;
             resultElement.style.color = "#333";
