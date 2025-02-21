@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>생일수 계산기</title>
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.min.js"></script>
     <style>
         :root {
             --primary-color: #4a90e2;
@@ -127,13 +128,6 @@
             margin-top: 5px;
         }
 
-        .loading {
-            display: none;
-            text-align: center;
-            margin: 10px 0;
-            color: var(--primary-color);
-        }
-
         @media (max-width: 600px) {
             .card-result {
                 grid-template-columns: 1fr;
@@ -174,8 +168,6 @@
             </div>
         </div>
 
-        <div id="loading" class="loading">변환 중...</div>
-
         <div class="card-result">
             <div class="card">
                 <h3>양력 카드</h3>
@@ -199,14 +191,9 @@
     </div>
 
     <script>
-        // API 키 (Decoding 된 키 사용)
-        const API_KEY = 'MILYiLsWAQ6xS8wiGu+0xnqhHeVSyR0OCXDQGAwVLbjJHK1ZHunwfpiDCFv/qZoPfug6onGR/VBNmOdaf85n5g==';
-        const BASE_URL = 'https://apis.data.go.kr/B090041/openapi/service/LrsrCldInfoService';
-
         const yearSelect = document.getElementById('year');
         const monthSelect = document.getElementById('month');
         const daySelect = document.getElementById('day');
-        const loadingElement = document.getElementById('loading');
         const currentYear = new Date().getFullYear();
 
         const tarotCards = [
@@ -329,135 +316,71 @@
             }
         }
 
-        async function convertDate(year, month, day, isSolar) {
-            const endpoint = isSolar ? 'getLunCalInfo' : 'getSolCalInfo';
-            const dateType = isSolar ? 'sol' : 'lun';
-
+        function convertDate(year, month, day, isSolar) {
             try {
-                loadingElement.style.display = 'block';
-
-                // API URL 구성
-                const params = new URLSearchParams({
-                    serviceKey: API_KEY,
-                    [`${dateType}Year`]: year,
-                    [`${dateType}Month`]: month.toString().padStart(2, '0'),
-                    [`${dateType}Day`]: day.toString().padStart(2, '0')
-                });
-
-                const apiUrl = `${BASE_URL}/${endpoint}?${params}`;
-
-                // CORS 우회를 위한 프록시 URL 및 헤더
-                const proxyUrl = 'https://cors-anywhere.herokuapp.com/https://wallace5683.github.io'; // 프록시 서버 변경
-                //const proxyUrl = 'https://proxy.cors.sh/';
-                //const headers = {
-                //    'x-cors-api-key': 'temp_d89c2d8fcfcb079dca45ab5315f80d5d' // 사용하지 않음
-                //};
-                const headers = {}; // CORS Anywhere는 헤더가 필요 없음
-
-                const response = await fetch(proxyUrl + apiUrl, { headers });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('HTTP error details:', response.status, response.statusText, errorText);
-                    throw new Error(`HTTP error! status: ${response.status}, ${response.statusText}, ${errorText}`);
+                if (isSolar) {
+                    // 양력 -> 음력
+                    const solar = Lunar.Solar.fromYmd(year, month, day);
+                    const lunar = solar.getLunar();
+                    return {
+                        solar: {
+                            year: solar.getYear(),
+                            month: solar.getMonth(),
+                            day: solar.getDay()
+                        },
+                        lunar: {
+                            year: lunar.getYear(),
+                            month: lunar.getMonth(),
+                            day: lunar.getDay()
+                        }
+                    };
+                } else {
+                    // 음력 -> 양력
+                    const lunar = Lunar.Lunar.fromYmd(year, month, day);
+                    const solar = lunar.getSolar();
+                    return {
+                        solar: {
+                            year: solar.getYear(),
+                            month: solar.getMonth(),
+                            day: solar.getDay()
+                        },
+                        lunar: {
+                            year: lunar.getYear(),
+                            month: lunar.getMonth(),
+                            day: lunar.getDay()
+                        }
+                    };
                 }
-
-                const text = await response.text();
-                console.log('API Response:', text); // API 응답 내용 로깅
-
-                // XML 파싱 에러 체크
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(text, "text/xml");
-
-                if (xmlDoc.getElementsByTagName('parsererror').length > 0) {
-                    const parserErrorText = xmlDoc.getElementsByTagName('parsererror')[0].textContent;
-                    throw new Error('XML 파싱 오류가 발생했습니다: ' + parserErrorText);
-                }
-
-                // API 응답 에러 체크
-                const errorCodeElement = xmlDoc.querySelector('resultCode');
-                const errorMsgElement = xmlDoc.querySelector('resultMsg');
-
-                if (errorCodeElement) {
-                    const code = errorCodeElement.textContent;
-                    const message = errorMsgElement ? errorMsgElement.textContent : '알 수 없는 오류';
-                    if (code !== '00') {
-                        throw new Error(`API 오류: ${message} (코드: ${code})`);
-                    }
-                }
-
-                // 결과 데이터 추출
-                const item = xmlDoc.querySelector('item');
-                if (!item) {
-                    throw new Error('날짜 정보를 찾을 수 없습니다.');
-                }
-
-                // 안전한 데이터 추출을 위한 헬퍼 함수
-                const safeParseInt = (element) => {
-                    if (!element) return null;
-                    const value = parseInt(element.textContent);
-                    return isNaN(value) ? null : value;
-                };
-
-                const getElementText = (parent, selector) => {
-                    const element = parent.querySelector(selector);
-                    return element ? element.textContent : null;
-                };
-
-                // 데이터 추출
-                const solar = {
-                    year: safeParseInt(item.querySelector('solYear')),
-                    month: safeParseInt(item.querySelector('solMonth')),
-                    day: safeParseInt(item.querySelector('solDay'))
-                };
-
-                const lunar = {
-                    year: safeParseInt(item.querySelector('lunYear')),
-                    month: safeParseInt(item.querySelector('lunMonth')),
-                    day: safeParseInt(item.querySelector('lunDay'))
-                };
-
-                // 데이터 유효성 검사
-                if (!solar.year || !solar.month || !solar.day ||
-                    !lunar.year || !lunar.month || !lunar.day) {
-                    throw new Error('날짜 데이터가 올바르지 않습니다.');
-                }
-
-                return { solar, lunar };
-
             } catch (error) {
-                console.error('Error in convertDate:', error);
-                document.getElementById('errorContainer').textContent = '날짜 변환 중 오류가 발생했습니다: ' + error.message;
-                throw error; // 오류를 다시 던져 상위 함수에서 처리하도록 함
-            } finally {
-                loadingElement.style.display = 'none';
+                console.error('날짜 변환 중 오류:', error);
+                throw new Error('날짜 변환 중 오류가 발생했습니다.');
             }
         }
 
-        async function calculateCards() {
+        function calculateCards() {
             if (!validateInputs()) return;
 
-            const year = yearSelect.value;
-            const month = monthSelect.value;
-            const day = daySelect.value;
+            const year = parseInt(yearSelect.value);
+            const month = parseInt(monthSelect.value);
+            const day = parseInt(daySelect.value);
             const isSolar = document.querySelector('input[name="calendarType"]:checked').value === 'solar';
 
             try {
-                const dateInfo = await convertDate(year, month, day, isSolar);
+                const dateInfo = convertDate(year, month, day, isSolar);
 
                 // 결과 표시
-                document.getElementById('solarDate').textContent =
+                document.getElementById('solarDate').textContent = 
                     `양력: ${dateInfo.solar.year}년 ${dateInfo.solar.month}월 ${dateInfo.solar.day}일`;
-                document.getElementById('lunarDate').textContent =
+                document.getElementById('lunarDate').textContent = 
                     `음력: ${dateInfo.lunar.year}년 ${dateInfo.lunar.month}월 ${dateInfo.lunar.day}일`;
 
                 const solarSum = calculateSingleDigit(
                     dateInfo.solar.year + dateInfo.solar.month + dateInfo.solar.day
                 );
 
-                // 각 카드 정보 표시
+                // 카드 정보 표시
                 displayCardInfo('solarCardInfo', solarSum);
-                displayCardInfo('lunarCardInfo',
+                displayCardInfo('lunarCardInfo', 
                     calculateSingleDigit(dateInfo.lunar.year + dateInfo.lunar.month + dateInfo.lunar.day));
                 displayCardInfo('shadowCardInfo', 22 - solarSum);
                 displayCardInfo('soulCardInfo', solarSum > 21 ? solarSum - 22 : solarSum);
@@ -488,7 +411,7 @@
         }
 
         function displayCardInfo(elementId, cardNumber) {
-            const card = tarotCards[(cardNumber - 1 + tarotCards.length) % tarotCards.length]; // cardNumber가 0일 때도 처리
+            const card = tarotCards[(cardNumber - 1 + tarotCards.length) % tarotCards.length];
             const cardInfoDiv = document.getElementById(elementId);
             cardInfoDiv.innerHTML = `
                 <div class="card-name">${card.name}</div>
