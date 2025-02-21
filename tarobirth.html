@@ -348,6 +348,7 @@
                 daySelect.value = '';
             }
         }
+        
         function convertDate(year, month, day, isSolar) {
             try {
                 if (isSolar) {
@@ -369,7 +370,7 @@
                     };
                 } else {
                     // 음력 -> 양력 변환
-                    const solarDate = holidayKR.getSolar(year, month, day);
+                    const solarDate = holidayKR.getSolar(year, month, day, false);
                     
                     return {
                         solar: {
