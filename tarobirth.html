@@ -352,14 +352,10 @@
         function convertDate(year, month, day, isSolar) {
             try {
                 if (isSolar) {
-                    // 양력 -> 음력 변환
+                    // 양력 -> 음력 변환 개선
                     const solarDate = lunisolar(`${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`);
                     const lunarDate = solarDate.lunar;
-        
-                    // 음력 월이 12를 초과하지 않도록 보정
-                    const fixedLunarMonth = lunarDate.month > 12 ? (lunarDate.month % 12 || 12) : lunarDate.month;
-                    const fixedLunarYear = lunarDate.month > 12 ? (lunarDate.year + Math.floor((lunarDate.month - 1) / 12)) : lunarDate.year;
-        
+                    
                     return {
                         solar: {
                             year: year,
@@ -367,15 +363,15 @@
                             day: day
                         },
                         lunar: {
-                            year: fixedLunarYear,
-                            month: fixedLunarMonth,
+                            year: lunarDate.year,
+                            month: lunarDate.month,
                             day: lunarDate.day
                         }
                     };
                 } else {
                     // 음력 -> 양력 변환
                     const lunarToSolarDate = lunisolar.lunar(year, month, day);
-        
+                    
                     return {
                         solar: {
                             year: lunarToSolarDate.year,
