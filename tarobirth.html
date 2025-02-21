@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>생일수 계산기</title>
-    <script src="https://www.unpkg.com/lunar-javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lunisolar/dist/lunisolar.min.js"></script>
     <style>
         :root {
             --primary-color: #4a90e2;
@@ -320,8 +320,8 @@
             try {
                 if (isSolar) {
                     // 양력 -> 음력
-                    const solar = LunarCalendar.solar(year, month, day);
-                    const lunar = solar.lunar;
+                    const date = lunisolar(`${year}-${month}-${day}`);
+                    const lunar = date.lunar;
                     return {
                         solar: {
                             year: year,
@@ -336,13 +336,12 @@
                     };
                 } else {
                     // 음력 -> 양력
-                    const lunar = LunarCalendar.lunar(year, month, day);
-                    const solar = lunar.solar;
+                    const date = lunisolar.lunar(year, month, day);
                     return {
                         solar: {
-                            year: solar.year,
-                            month: solar.month,
-                            day: solar.day
+                            year: date.year,
+                            month: date.month,
+                            day: date.day
                         },
                         lunar: {
                             year: year,
@@ -353,7 +352,7 @@
                 }
             } catch (error) {
                 console.error('날짜 변환 중 오류:', error);
-                throw new Error('유효하지 않은 날짜입니다. 다시 선택해주세요.');
+                throw new Error('날짜 변환 중 오류가 발생했습니다. 올바른 날짜를 선택해주세요.');
             }
         }
 
