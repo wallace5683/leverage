@@ -536,45 +536,54 @@ while (lunarDays + getLunarYearDays(lunarYear) <= totalDays) {
             const monthSelect = document.getElementById('month');
             const daySelect = document.getElementById('day');
             const currentYear = new Date().getFullYear();
-
-            // 년도 옵션 추가
+        
+            // 년도 옵션 추가 (1900년부터 현재 연도까지)
             yearSelect.innerHTML = '<option value="">년도</option>';
             for (let y = currentYear; y >= 1900; y--) {
                 yearSelect.innerHTML += `<option value="${y}">${y}년</option>`;
             }
-
+        
             // 월 옵션 추가
             monthSelect.innerHTML = '<option value="">월</option>';
             for (let m = 1; m <= 12; m++) {
                 monthSelect.innerHTML += `<option value="${m.toString().padStart(2, '0')}">${m}월</option>`;
             }
-
-            // 일자 업데이트 이벤트 리스너 추가
+        
+            // 일자 업데이트 함수 추가
+            function updateDays() {
+                const year = parseInt(yearSelect.value) || currentYear;
+                const month = parseInt(monthSelect.value) || 1;
+                const lastDay = new Date(year, month, 0).getDate();
+        
+                // 일자 옵션 추가
+                daySelect.innerHTML = '<option value="">일</option>';
+                for (let d = 1; d <= lastDay; d++) {
+                    daySelect.innerHTML += `<option value="${d.toString().padStart(2, '0')}">${d}일</option>`;
+                }
+            }
+        
+            // 이벤트 리스너 추가
             yearSelect.addEventListener('change', updateDays);
             monthSelect.addEventListener('change', updateDays);
+        
+            // 라디오 버튼 변경 시 날짜 초기화
+            document.querySelectorAll('input[name="calendarType"]').forEach(radio => {
+                radio.addEventListener('change', () => {
+                    yearSelect.value = '';
+                    monthSelect.value = '';
+                    daySelect.innerHTML = '<option value="">일</option>';
+                    document.getElementById('errorContainer').textContent = '';
+                    
+                    // 결과 카드 초기화
+                    ['solarDate', 'lunarDate', 'solarCardInfo', 'lunarCardInfo', 'shadowCardInfo', 'soulCardInfo'].forEach(id => {
+                        document.getElementById(id).textContent = '';
+                    });
+                });
+            });
         }
-
-        // 일자 업데이트 함수
-        function updateDays() {
-            const yearSelect = document.getElementById('year');
-            const monthSelect = document.getElementById('month');
-            const daySelect = document.getElementById('day');
-
-            const year = parseInt(yearSelect.value) || new Date().getFullYear();
-            const month = parseInt(monthSelect.value) || 1;
-            const lastDay = new Date(year, month, 0).getDate();
-
-            // 일자 옵션 추가
-            daySelect.innerHTML = '<option value="">일</option>';
-            for (let d = 1; d <= lastDay; d++) {
-                daySelect.innerHTML += `<option value="${d.toString().padStart(2, '0')}">${d}일</option>`;
-            }
-
-            // 선택된 일자가 해당 월의 마지막 일자를 초과하면 초기화
-            if (parseInt(daySelect.value) > lastDay) {
-                daySelect.value = '';
-            }
-        }
+        
+        // 페이지 로드 시 초기화
+        window.addEventListener('load', initializeDateSelects);
 
         // 카드 계산 함수
         function calculateCards() {
