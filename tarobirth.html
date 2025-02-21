@@ -131,12 +131,12 @@
             .card-result {
                 grid-template-columns: 1fr;
             }
-            
+
             .date-inputs {
                 flex-direction: column;
                 align-items: stretch;
             }
-            
+
             select {
                 width: 100%;
             }
@@ -161,15 +161,9 @@
             </div>
 
             <div class="date-inputs">
-                <select id="year" aria-label="년도 선택">
-                    <option value="">년도</option>
-                </select>
-                <select id="month" aria-label="월 선택">
-                    <option value="">월</option>
-                </select>
-                <select id="day" aria-label="일 선택">
-                    <option value="">일</option>
-                </select>
+                <select id="year" aria-label="년도 선택"></select>
+                <select id="month" aria-label="월 선택"></select>
+                <select id="day" aria-label="일 선택"></select>
             </div>
         </div>
 
@@ -194,212 +188,106 @@
             </div>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/solarlunar@1.0.7/index.js"></script>
-
     <script>
-        // 타로 카드 정보
-        const tarotCards = {
-            0: { name: "광대(The Fool)", meaning: "자유, 새로운 모험, 가능성" },
-            1: { name: "마법사(The Magician)", meaning: "창조성, 능동성, 새로운 시작" },
-            2: { name: "여사제(The High Priestess)", meaning: "직관, 내면의 지혜, 신비" },
-            3: { name: "여제(The Empress)", meaning: "풍요, 모성애, 창조성" },
-            4: { name: "황제(The Emperor)", meaning: "권위, 안정, 책임감" },
-            5: { name: "교황(The Hierophant)", meaning: "전통, 지혜, 영적 성장" },
-            6: { name: "연인(The Lovers)", meaning: "관계, 조화, 선택" },
-            7: { name: "전차(The Chariot)", meaning: "의지력, 승리, 목표 달성" },
-            8: { name: "힘(Strength)", meaning: "용기, 인내, 내면의 힘" },
-            9: { name: "은둔자(The Hermit)", meaning: "내성적 탐구, 고독, 진리 탐색" },
-            10: { name: "운명의 수레바퀴(The Wheel of Fortune)", meaning: "변화, 운명, 새로운 주기" },
-            11: { name: "정의(Justice)", meaning: "공정성, 균형, 진실" },
-            12: { name: "매달린 사람(The Hanged Man)", meaning: "희생, 관점 변화, 인내" },
-            13: { name: "죽음(Death)", meaning: "끝과 새로운 시작, 변화" },
-            14: { name: "절제(Temperance)", meaning: "조화, 균형, 중용" },
-            15: { name: "악마(The Devil)", meaning: "집착, 물질적 유혹, 억압" },
-            16: { name: "탑(The Tower)", meaning: "갑작스러운 변화, 깨달음" },
-            17: { name: "별(The Star)", meaning: "희망, 영감, 치유" },
-            18: { name: "달(The Moon)", meaning: "환상, 두려움, 잠재의식" },
-            19: { name: "태양(The Sun)", meaning: "성공, 긍정성, 기쁨" },
-            20: { name: "심판(Judgement)", meaning: "각성, 심사숙고, 재탄생" },
-            21: { name: "세계(The World)", meaning: "완성, 성취, 통합" },
-            22: { name: "광대(The Fool)", meaning: "자유, 새로운 모험, 가능성" }
-        };
+        const yearSelect = document.getElementById('year');
+        const monthSelect = document.getElementById('month');
+        const daySelect = document.getElementById('day');
+        const currentYear = new Date().getFullYear();
 
-        // 상수 정의
-        const CONSTANTS = {
-            MIN_YEAR: 1900,
-            MAX_CARDS: 22,
-            SINGLE_DIGIT_THRESHOLD: 10,
-            ERROR_MESSAGES: {
-                INVALID_DATE: '유효하지 않은 날짜입니다.',
-                CALCULATION_ERROR: '계산 중 오류가 발생했습니다.',
-                REQUIRED_FIELDS: '모든 필드를 선택해주세요.'
-            }
-        };
-
-        // 초기화 함수들
         function initializeDateSelects() {
-            const yearSelect = document.getElementById('year');
-            const monthSelect = document.getElementById('month');
-            const currentYear = new Date().getFullYear();
-
-            // 년도 옵션 생성
             yearSelect.innerHTML = '<option value="">년도</option>';
-            for (let year = CONSTANTS.MIN_YEAR; year <= currentYear; year++) {
-                const option = document.createElement('option');
-                option.value = year;
-                option.textContent = `${year}년`;
-                yearSelect.appendChild(option);
+            for (let y = currentYear; y >= 1900; y--) { // 년도를 내림차순으로 변경
+                yearSelect.innerHTML += `<option value="${y}">${y}년</option>`;
             }
 
-            // 월 옵션 생성
             monthSelect.innerHTML = '<option value="">월</option>';
-            for (let month = 1; month <= 12; month++) {
-                const option = document.createElement('option');
-                option.value = month;
-                option.textContent = `${month}월`;
-                monthSelect.appendChild(option);
+            for (let m = 1; m <= 12; m++) {
+                monthSelect.innerHTML += `<option value="${m}">${m}월</option>`;
             }
 
             updateDays();
         }
 
         function updateDays() {
-            const year = parseInt(document.getElementById('year').value) || new Date().getFullYear();
-            const month = parseInt(document.getElementById('month').value) || 1;
-            const daySelect = document.getElementById('day');
+            const year = parseInt(yearSelect.value) || currentYear;
+            const month = parseInt(monthSelect.value) || 1;
             const lastDay = new Date(year, month, 0).getDate();
 
             daySelect.innerHTML = '<option value="">일</option>';
-            for (let day = 1; day <= lastDay; day++) {
-                const option = document.createElement('option');
-                option.value = day;
-                option.textContent = `${day}일`;
-                daySelect.appendChild(option);
+            for (let d = 1; d <= lastDay; d++) {
+                daySelect.innerHTML += `<option value="${d}">${d}일</option>`;
             }
-        }
 
-        // 유틸리티 함수들
-        function showError(message) {
-            const errorContainer = document.getElementById('errorContainer');
-            errorContainer.textContent = message;
-            setTimeout(() => {
-                errorContainer.textContent = '';
-            }, 3000);
-        }
-
-        function calculateSingleDigit(num) {
-            if (num === 0) return 0;
-            return 1 + ((num - 1) % 9);
-        }
-
-        function calculateDateSum(year, month, day) {
-            const sum = String(year + month + day).split('')
-                .reduce((acc, digit) => acc + parseInt(digit), 0);
-            return calculateSingleDigit(sum);
-        }
-
-        function calculateShadowCard(solarCard) {
-            return CONSTANTS.MAX_CARDS - solarCard;
-        }
-
-        function calculateSoulCard(dateSum) {
-            if (dateSum <= 21) return null;
-            return dateSum === 22 ? 0 : dateSum - 22;
-        }
-
-        function displayCardInfo(elementId, cardNumber) {
-            const element = document.getElementById(elementId);
-            if (cardNumber === null) {
-                element.innerHTML = '<div class="card-meaning">해당없음</div>';
-                return;
+            if (parseInt(daySelect.value) > lastDay) {
+                daySelect.value = '';
             }
-            const card = tarotCards[cardNumber];
-            element.innerHTML = `
-                <div class="card-name">${cardNumber}번 카드: ${card.name}</div>
-                <div class="card-meaning">의미: ${card.meaning}</div>
-            `;
         }
 
         function validateInputs() {
-            const year = parseInt(document.getElementById('year').value);
-            const month = parseInt(document.getElementById('month').value);
-            const day = parseInt(document.getElementById('day').value);
-
-            if (!year || !month || !day) {
-                showError(CONSTANTS.ERROR_MESSAGES.REQUIRED_FIELDS);
+            if (!yearSelect.value || !monthSelect.value || !daySelect.value) {
+                document.getElementById('errorContainer').textContent = '모든 필드를 선택해주세요.';
                 return false;
             }
-
-            if (isNaN(year) || isNaN(month) || isNaN(day)) {
-                showError(CONSTANTS.ERROR_MESSAGES.INVALID_DATE);
-                return false;
-            }
-
+            document.getElementById('errorContainer').textContent = '';
             return true;
         }
 
         function calculateCards() {
             if (!validateInputs()) return;
 
-            try {
-                const year = parseInt(document.getElementById('year').value);
-                const month = parseInt(document.getElementById('month').value);
-                const day = parseInt(document.getElementById('day').value);
-                
-                const isSolar = document.querySelector('input[name="calendarType"]:checked').value === 'solar';
-                let solarDateText = `양력: ${year}년 ${month}월 ${day}일`;
-                let lunarDateText = '-';
+            const year = parseInt(yearSelect.value);
+            const month = parseInt(monthSelect.value);
+            const day = parseInt(daySelect.value);
+            const isSolar = document.querySelector('input[name="calendarType"]:checked').value === 'solar';
 
-                let lunarDate, solarDate;
+            let solarDate, lunarDate;
+            try {
                 if (isSolar) {
                     lunarDate = solarlunar.solar2lunar(year, month, day);
-                    lunarDateText = `음력: ${lunarDate.lYear}년 ${lunarDate.lMonth}월 ${lunarDate.lDay}일 ${lunarDate.isLeap ? '(윤달)' : ''}`;
+                    solarDate = { cYear: year, cMonth: month, cDay: day };
                 } else {
                     solarDate = solarlunar.lunar2solar(year, month, day, false);
-                    solarDateText = `양력: ${solarDate.cYear}년 ${solarDate.cMonth}월 ${solarDate.cDay}일`;
+                    lunarDate = { lYear: year, lMonth: month, lDay: day };
                 }
 
-                document.getElementById('solarDate').textContent = solarDateText;
-                document.getElementById('lunarDate').textContent = lunarDateText;
+                document.getElementById('solarDate').textContent = `양력: ${solarDate.cYear}년 ${solarDate.cMonth}월 ${solarDate.cDay}일`;
+                document.getElementById('lunarDate').textContent = `음력: ${lunarDate.lYear}년 ${lunarDate.lMonth}월 ${lunarDate.lDay}일`;
 
-                const solarSum = calculateDateSum(year, month, day);
-       const lunarSum = lunarDate ? 
-           calculateDateSum(lunarDate.lYear, lunarDate.lMonth, lunarDate.lDay) : 
-           calculateDateSum(year, month, day);
+                const solarSum = calculateSingleDigit(solarDate.cYear + solarDate.cMonth + solarDate.cDay);
+                displayCardInfo('solarCardInfo', solarSum);
+                displayCardInfo('lunarCardInfo', calculateSingleDigit(lunarDate.lYear + lunarDate.lMonth + lunarDate.lDay));
+                displayCardInfo('shadowCardInfo', 22 - solarSum);
+                displayCardInfo('soulCardInfo', solarSum > 21 ? solarSum - 22 : null);
+            } catch (error) {
+                document.getElementById('errorContainer').textContent = '선택한 날짜가 유효하지 않습니다. 다시 확인해주세요.';
+            }
+        }
 
-       displayCardInfo('solarCardInfo', solarSum);
-       displayCardInfo('lunarCardInfo', lunarSum);
-       displayCardInfo('shadowCardInfo', calculateShadowCard(solarSum));
-       displayCardInfo('soulCardInfo', calculateSoulCard(solarSum));
+        function calculateSingleDigit(num) {
+            return 1 + ((num - 1) % 9);
+        }
 
-   } catch (error) {
-       console.error('Error calculating cards:', error);
-       showError(CONSTANTS.ERROR_MESSAGES.CALCULATION_ERROR);
-   }
-}
+        function displayCardInfo(id, cardNumber) {
+            const tarotCards = ["광대(The Fool)", "마법사(The Magician)", "여사제(The High Priestess)",
+                                "여제(The Empress)", "황제(The Emperor)", "교황(The Hierophant)",
+                                "연인(The Lovers)", "전차(The Chariot)", "힘(Strength)", "은둔자(The Hermit)",
+                                "운명의 수레바퀴(The Wheel of Fortune)", "정의(Justice)", "매달린 사람(The Hanged Man)",
+                                "죽음(Death)", "절제(Temperance)", "악마(The Devil)", "탑(The Tower)",
+                                "별(The Star)", "달(The Moon)", "태양(The Sun)", "심판(Judgement)", "세계(The World)"];
 
-// DOM이 로드되면 초기화 및 이벤트 리스너 설정
-document.addEventListener('DOMContentLoaded', () => {
-   // 초기 날짜 선택 옵션 설정
-   initializeDateSelects();
-   
-   // 년/월 변경 시 일자 업데이트 및 카드 계산
-   document.getElementById('year').addEventListener('change', () => {
-       updateDays();
-       calculateCards();
-   });
-   
-   document.getElementById('month').addEventListener('change', () => {
-       updateDays();
-       calculateCards();
-   });
-   
-   // 일자 변경 시 카드 계산
-   document.getElementById('day').addEventListener('change', calculateCards);
-   
-   // 음/양력 변경 시 카드 계산
-   document.querySelectorAll('input[name="calendarType"]').forEach(radio => {
-       radio.addEventListener('change', calculateCards);
-   });
-});
+            const element = document.getElementById(id);
+            element.innerHTML = cardNumber !== null ? `<div class="card-name">${cardNumber}번 카드: ${tarotCards[cardNumber]}</div>`
+                                                    : '<div class="card-meaning">해당없음</div>';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeDateSelects();
+            yearSelect.addEventListener('change', () => { updateDays(); calculateCards(); });
+            monthSelect.addEventListener('change', () => { updateDays(); calculateCards(); });
+            daySelect.addEventListener('change', calculateCards);
+            document.querySelectorAll('input[name="calendarType"]').forEach(radio => radio.addEventListener('change', calculateCards));
+        });
+    </script>
+</body>
+</html>
