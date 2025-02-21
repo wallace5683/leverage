@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>생일수 계산기</title>
+    <title>생aaa일수 계산기</title>
     <script src="https://cdn.jsdelivr.net/npm/lunisolar@2.0.0/dist/lunisolar.min.js"></script>
     <style>
         :root {
@@ -351,9 +351,12 @@
 
         function convertDate(year, month, day, isSolar) {
             try {
+                // month를 0-based로 변환 (1월 = 0)
+                const adjustedMonth = month - 1;
+                
                 if (isSolar) {
                     // 양력 -> 음력 변환
-                    const lunar = Lunisolar.fromGregorian(year, month, day);
+                    const date = new Lunisolar(new Date(year, adjustedMonth, day));
                     return {
                         solar: {
                             year: year,
@@ -361,19 +364,20 @@
                             day: day
                         },
                         lunar: {
-                            year: lunar.lunar.year,
-                            month: lunar.lunar.month,
-                            day: lunar.lunar.day
+                            year: date.lunar.year,
+                            month: date.lunar.month, // 라이브러리는 1-based month를 반환
+                            day: date.lunar.day
                         }
                     };
                 } else {
                     // 음력 -> 양력 변환
-                    const solar = Lunisolar.fromLunar(year, month, day);
+                    const date = Lunisolar.lunar(year, month, day);
+                    const solarDate = date.gregorian;
                     return {
                         solar: {
-                            year: solar.gregorian.year,
-                            month: solar.gregorian.month,
-                            day: solar.gregorian.day
+                            year: solarDate.getFullYear(),
+                            month: solarDate.getMonth() + 1, // 0-based를 1-based로 변환
+                            day: solarDate.getDate()
                         },
                         lunar: {
                             year: year,
