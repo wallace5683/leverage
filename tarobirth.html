@@ -354,12 +354,6 @@
                 if (isSolar) {
                     // 양력 -> 음력 변환
                     const dateString = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-                    
-                    // 유효성 검사 추가
-                    if (!isValidDate(year, month, day)) {
-                        throw new Error('올바르지 않은 날짜입니다.');
-                    }
-        
                     const date = lunisolar(dateString);
                     const lunar = date.lunar;
             
@@ -378,12 +372,9 @@
                 } else {
                     // 음력 -> 양력 변환
                     try {
-                        // 유효성 검사 추가
-                        if (!isValidLunarDate(year, month, day)) {
-                            throw new Error('올바르지 않은 음력 날짜입니다.');
-                        }
-        
+                        // lunisolar 라이브러리의 음력 변환 메서드 직접 사용
                         const lunarToSolarDate = lunisolar.lunar(year, month, day);
+                        
                         return {
                             solar: {
                                 year: lunarToSolarDate.year,
@@ -397,6 +388,7 @@
                             }
                         };
                     } catch (lunarConversionError) {
+                        // 변환 실패 시 더 구체적인 오류 처리
                         console.error('음력 변환 중 오류:', lunarConversionError);
                         throw new Error('올바르지 않은 음력 날짜입니다. 다시 확인해주세요.');
                     }
@@ -415,7 +407,7 @@
                    date.getDate() === day;
         }
         
-        // 음력 날짜 유효성 검사 함수 추가
+        // 음력 날짜 유효성 검사 함수 개선
         function isValidLunarDate(year, month, day) {
             try {
                 // lunisolar를 사용해 음력 날짜 검증
@@ -428,25 +420,26 @@
 
         function calculateCards() {
             if (!validateInputs()) return;
-        
+
             const year = parseInt(yearSelect.value);
             const month = parseInt(monthSelect.value);
             const day = parseInt(daySelect.value);
             const isSolar = document.querySelector('input[name="calendarType"]:checked').value === 'solar';
-                    // 연령 제한 예시 (예: 120세 이상 제한)
-            const currentYear = new Date().getFullYear();
-            if (currentYear - year > 120) {
-                throw new Error('유효하지 않은 생년월일입니다. 120세 이상은 선택할 수 없습니다.');
-            }
-            
+
             try {
+                // 음력 날짜일 경우 추가 검증
+                if (!isSolar && !isValidLunarDate(year, month, day)) {
+                    throw new Error('올바르지 않은 음력 날짜입니다. 다시 확인해주세요.');
+                }
+        
                 const dateInfo = convertDate(year, month, day, isSolar);
         
-                // 결과 표시
+                // 결과 표시 로직 (기존과 동일)
                 document.getElementById('solarDate').textContent = 
                     `양력: ${dateInfo.solar.year}년 ${dateInfo.solar.month}월 ${dateInfo.solar.day}일`;
                 document.getElementById('lunarDate').textContent = 
                     `음력: ${dateInfo.lunar.year}년 ${dateInfo.lunar.month}월 ${dateInfo.lunar.day}일`;
+
         
                 // 양력 계산
                 const solarInitialSum = dateInfo.solar.year + dateInfo.solar.month + dateInfo.solar.day;
