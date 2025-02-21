@@ -220,7 +220,7 @@
             }
 
             if (parseInt(daySelect.value) > lastDay) {
-                daySelect.value = '';
+                daySelect.value = ''; // 월 변경 시 일 select box 초기화
             }
         }
 
@@ -261,6 +261,13 @@
                 displayCardInfo('soulCardInfo', solarSum > 21 ? solarSum - 22 : null);
             } catch (error) {
                 document.getElementById('errorContainer').textContent = '선택한 날짜가 유효하지 않습니다. 다시 확인해주세요.';
+                // 오류 발생 시 카드 정보 초기화
+                document.getElementById('solarDate').textContent = '양력: -';
+                document.getElementById('lunarDate').textContent = '음력: -';
+                displayCardInfo('solarCardInfo', null);
+                displayCardInfo('lunarCardInfo', null);
+                displayCardInfo('shadowCardInfo', null);
+                displayCardInfo('soulCardInfo', null);
             }
         }
 
