@@ -207,6 +207,8 @@
         const monthSelect = document.getElementById('month');
         const daySelect = document.getElementById('day');
         const currentYear = new Date().getFullYear();
+        const errorContainer = document.getElementById('errorContainer');
+
         const tarotCards = [
             {
                 name: "마법사(The Magician)",
@@ -390,8 +392,7 @@
                 throw new Error('올바르지 않은 날짜입니다. 다시 확인해주세요.');
             }
         }
-
-        // 날짜 유효성 검사 함수 추가
+                // 날짜 유효성 검사 함수 추가
         function isValidDate(year, month, day) {
             const date = new Date(year, month - 1, day);
             return date.getFullYear() === year && 
@@ -402,15 +403,17 @@
         // 음력 날짜 유효성 검사 함수 개선
         function isValidLunarDate(year, month, day) {
             try {
-                // lunisolar를 사용해 음력 날짜 검증
-                const lunarToSolarDate = lunisolar.lunar(year, month, day);
-                return true;
+                // holidayKR를 사용하여 음력 -> 양력 변환 시 유효성 검사
+                const solarDate = holidayKR.getSolar(year, month, day, false);
+                return true; // 변환에 성공하면 유효한 음력 날짜
             } catch (error) {
-                return false;
+                return false; // 변환에 실패하면 유효하지 않은 음력 날짜
             }
         }
 
         function calculateCards() {
+             // 에러 메시지 초기화
+            errorContainer.textContent = '';
             if (!validateInputs()) return;
 
             const year = parseInt(yearSelect.value);
@@ -450,86 +453,67 @@
                 if (solarResult.firstSum >= 22) {
                     displayCardInfo('soulCardInfo', solarResult.firstSum - 22);
                 } else {
-                    displayCardInfo('soulCardInfo', null);
+                    displayCardInfo('soulCardInfo', solarResult.firstSum);
                 }
-                document.getElementById('errorContainer').textContent = '';
-
+        
             } catch (error) {
-                console.error('Error in calculateCards:', error);
-                document.getElementById('errorContainer').textContent = error.message;
-                clearDisplays();
+                // 에러 메시지 표시
+                errorContainer.textContent = error.message;
+                console.error(error.message);
             }
         }
-
+        
         function validateInputs() {
-            if (!yearSelect.value || !monthSelect.value || !daySelect.value) {
-                document.getElementById('errorContainer').textContent = '년, 월, 일을 모두 선택해주세요.';
-                return false;
+            const year = parseInt(yearSelect.value);
+            const month = parseInt(monthSelect.value);
+            const day = parseInt(daySelect.value);
+            const isSolar = document.querySelector('input[name="calendarType"]:checked').value === 'solar';
+            let isValid = true;
+        
+             // 에러 메시지 초기화
+            errorContainer.textContent = '';
+        
+            if (!year || !month || !day) {
+                errorContainer.textContent = '년, 월, 일을 모두 선택해주세요.';
+                isValid = false;
+            } else if (isSolar && !isValidDate(year, month, day)) {
+                errorContainer.textContent = '올바르지 않은 양력 날짜입니다. 다시 확인해주세요.';
+                isValid = false;
             }
-            return true;
+        
+            return isValid;
         }
 
-        function calculateBirthNumber(number) {
-            // 생년월일 합계의 각 자리수를 더한 첫 번째 결과
-            const firstSum = String(number).split('').map(Number).reduce((a, b) => a + b, 0);
-            
-            // 21을 초과하는 경우에만 한번 더 각 자리수를 더함
-            if (firstSum > 21) {
-                const finalSum = String(firstSum).split('').map(Number).reduce((a, b) => a + b, 0);
-                return {
-                    firstSum: firstSum,  // 소울 카드 계산용
-                    finalSum: finalSum   // 최종 카드 번호
-                };
+        function calculateBirthNumber(initialSum) {
+            let firstSum = String(initialSum).split('').reduce((acc, digit) => acc + parseInt(digit), 0);
+            let finalSum = firstSum;
+
+            while (finalSum > 22) {
+                finalSum = String(finalSum).split('').reduce((acc, digit) => acc + parseInt(digit), 0);
             }
-            
-            return {
-                firstSum: firstSum,
-                finalSum: firstSum
-            };
+
+            return { firstSum: firstSum, finalSum: finalSum };
         }
 
-        // displayCardInfo 함수 수정
         function displayCardInfo(elementId, cardNumber) {
-            const cardInfoDiv = document.getElementById(elementId);
-            
-            // 소울 카드이고 숫자가 21 이하인 경우
-            if (elementId === 'soulCardInfo' && cardNumber <= 21) {
-                cardInfoDiv.innerHTML = `
-                    <div class="card-name">해당 없음</div>
-                    <div class="card-meaning">양력 숫자가 21 이하일 경우 소울 카드는 없습니다.</div>
-                `;
-                return;
-            }
-            
-            const card = tarotCards[(cardNumber - 1 + tarotCards.length) % tarotCards.length];
-            cardInfoDiv.innerHTML = `
-                <div class="card-name">${card.number}. ${card.name}</div>
-                <div class="card-meaning">${card.meaning}</div>
-            `;
-        }
+            const card = tarotCards.find(card => parseInt(card.number) === cardNumber);
+            const element = document.getElementById(elementId);
 
-        function clearDisplays() {
-            document.getElementById('solarDate').textContent = '양력: -';
-            document.getElementById('lunarDate').textContent = '음력: -';
-            document.getElementById('solarCardInfo').innerHTML = '';
-            document.getElementById('lunarCardInfo').innerHTML = '';
-            document.getElementById('shadowCardInfo').innerHTML = '';
-            document.getElementById('soulCardInfo').innerHTML = '';
+            if (card) {
+                element.innerHTML = `
+                    <div class="card-name">${card.name}</div>
+                    <div class="card-meaning">${card.meaning}</div>
+                `;
+            } else {
+                element.textContent = "해당하는 카드 정보가 없습니다.";
+            }
         }
 
         yearSelect.addEventListener('change', updateDays);
         monthSelect.addEventListener('change', updateDays);
 
-        // 이벤트 리스너 등록
-        document.querySelectorAll('input[name="calendarType"]').forEach(radio => {
-            radio.addEventListener('change', calculateCards);
-        });
-        yearSelect.addEventListener('change', calculateCards);
-        monthSelect.addEventListener('change', calculateCards);
-        daySelect.addEventListener('change', calculateCards);
-
-        initializeDateSelects(); // 페이지 로드 시 초기화
-        calculateCards(); // 초기 카드 계산
+        // Run
+        initializeDateSelects();
     </script>
 </body>
 </html>
