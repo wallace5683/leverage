@@ -127,6 +127,13 @@
             margin-top: 5px;
         }
 
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 10px 0;
+            color: var(--primary-color);
+        }
+
         @media (max-width: 600px) {
             .card-result {
                 grid-template-columns: 1fr;
@@ -167,6 +174,8 @@
             </div>
         </div>
 
+        <div id="loading" class="loading">변환 중...</div>
+
         <div class="card-result">
             <div class="card">
                 <h3>양력 카드</h3>
@@ -191,11 +200,12 @@
 
     <script>
         const API_KEY = 'MILYiLsWAQ6xS8wiGu%2B0xnqhHeVSyR0OCXDQGAwVLbjJHK1ZHunwfpiDCFv%2FqZoPfug6onGR%2FVBNmOdaf85n5g%3D%3D';
-        const BASE_URL = 'http://apis.data.go.kr/B090041/openapi/service/LrsrCldInfoService';
+        const BASE_URL = 'https://apis.data.go.kr/B090041/openapi/service/LrsrCldInfoService';
         
         const yearSelect = document.getElementById('year');
         const monthSelect = document.getElementById('month');
         const daySelect = document.getElementById('day');
+        const loadingElement = document.getElementById('loading');
         const currentYear = new Date().getFullYear();
 
         const tarotCards = [
@@ -323,8 +333,13 @@
             const dateType = isSolar ? 'sol' : 'lun';
             
             try {
-                const url = `${BASE_URL}/${endpoint}?serviceKey=${API_KEY}&${dateType}Year=${year}&${dateType}Month=${month}&${dateType}Day=${day}`;
-                const response = await fetch(url);
+                loadingElement.style.display = 'block';
+                
+                // CORS 프록시 서버를 통한 요청
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const apiUrl = `${BASE_URL}/${endpoint}?serviceKey=${API_KEY}&${dateType}Year=${year}&${dateType}Month=${month}&${dateType}Day=${day}`;
+                
+                const response = await fetch(proxyUrl + apiUrl);
                 const text = await response.text();
                 
                 // XML 파싱
@@ -349,11 +364,18 @@
                         year: parseInt(item.querySelector('solYear').textContent),
                         month: parseInt(item.querySelector('solMonth').textContent),
                         day: parseInt(item.querySelector('solDay').textContent)
+                    },
+                    lunar: {
+                        year: parseInt(item.querySelector('lunYear').textContent),
+                        month: parseInt(item.querySelector('lunMonth').textContent),
+                        day: parseInt(item.querySelector('lunDay').textContent)
                     }
                 };
             } catch (error) {
                 console.error('Error:', error);
                 throw new Error('날짜 변환 중 오류가 발생했습니다: ' + error.message);
+            } finally {
+                loadingElement.style.display = 'none';
             }
         }
 
@@ -436,4 +458,7 @@
             daySelect.addEventListener('change', calculateCards);
             document.querySelectorAll('input[name="calendarType"]').forEach(radio => 
                 radio.addEventListener('change', calculateCards));
-        });,
+        });
+    </script>
+</body>
+</html>
