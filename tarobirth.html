@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>생일수 계산기</title>
-    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.min.js"></script>
+    <script src="https://www.unpkg.com/lunar-javascript"></script>
     <style>
         :root {
             --primary-color: #4a90e2;
@@ -146,7 +146,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>타로 생일수 계산기</h1>
+        <h1>생일수 계산기</h1>
         <div id="errorContainer" class="error-message" role="alert"></div>
 
         <div class="input-group">
@@ -320,40 +320,40 @@
             try {
                 if (isSolar) {
                     // 양력 -> 음력
-                    const solar = Lunar.Solar.fromYmd(year, month, day);
-                    const lunar = solar.getLunar();
+                    const solar = LunarCalendar.solar(year, month, day);
+                    const lunar = solar.lunar;
                     return {
                         solar: {
-                            year: solar.getYear(),
-                            month: solar.getMonth(),
-                            day: solar.getDay()
+                            year: year,
+                            month: month,
+                            day: day
                         },
                         lunar: {
-                            year: lunar.getYear(),
-                            month: lunar.getMonth(),
-                            day: lunar.getDay()
+                            year: lunar.year,
+                            month: lunar.month,
+                            day: lunar.day
                         }
                     };
                 } else {
                     // 음력 -> 양력
-                    const lunar = Lunar.Lunar.fromYmd(year, month, day);
-                    const solar = lunar.getSolar();
+                    const lunar = LunarCalendar.lunar(year, month, day);
+                    const solar = lunar.solar;
                     return {
                         solar: {
-                            year: solar.getYear(),
-                            month: solar.getMonth(),
-                            day: solar.getDay()
+                            year: solar.year,
+                            month: solar.month,
+                            day: solar.day
                         },
                         lunar: {
-                            year: lunar.getYear(),
-                            month: lunar.getMonth(),
-                            day: lunar.getDay()
+                            year: year,
+                            month: month,
+                            day: day
                         }
                     };
                 }
             } catch (error) {
                 console.error('날짜 변환 중 오류:', error);
-                throw new Error('날짜 변환 중 오류가 발생했습니다.');
+                throw new Error('유효하지 않은 날짜입니다. 다시 선택해주세요.');
             }
         }
 
