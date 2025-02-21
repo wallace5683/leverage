@@ -371,20 +371,24 @@
                     };
                 } else {
                     // 음력 -> 양력 변환
-                    const lunarToSolarDate = lunisolar.lunar(year, month, day);
-        
-                    return {
-                        solar: {
-                            year: lunarToSolarDate.year,
-                            month: lunarToSolarDate.month,
-                            day: lunarToSolarDate.day
-                        },
-                        lunar: {
-                            year: year,
-                            month: month,
-                            day: day
-                        }
-                    };
+                    try {
+                        const lunarToSolarDate = lunisolar.lunar(year, month, day);
+                        return {
+                            solar: {
+                                year: lunarToSolarDate.year,
+                                month: lunarToSolarDate.month,
+                                day: lunarToSolarDate.day
+                            },
+                            lunar: {
+                                year: year,
+                                month: month,
+                                day: day
+                            }
+                        };
+                    } catch (lunarConversionError) {
+                        console.error('음력 변환 중 오류:', lunarConversionError);
+                        throw new Error('올바르지 않은 음력 날짜입니다. 다시 확인해주세요.');
+                    }
                 }
             } catch (error) {
                 console.error('날짜 변환 중 오류:', error);
