@@ -319,7 +319,27 @@
                 meaning: "순수, 모험, 자유, 무한한 가능성. 자유분방하고 창의적인 성격, 새로운 도전을 즐기는 특성을 가집니다."
         }
     ];
-
+	// 스크립트 내 다른 코드들 앞에 추가
+	function testDateConversion() {
+	    const testCases = [
+	        { year: 2024, month: 2, day: 21, isSolar: true },  // 현재 날짜 예시
+	        { year: 1990, month: 5, day: 15, isSolar: true },
+	        { year: 2000, month: 12, day: 31, isSolar: true }
+	    ];
+	
+	    testCases.forEach(testCase => {
+	        try {
+	            console.log(`테스트 날짜: ${testCase.year}년 ${testCase.month}월 ${testCase.day}일 (${testCase.isSolar ? '양력' : '음력'})`);
+	            const result = convertDate(testCase.year, testCase.month, testCase.day, testCase.isSolar);
+	            console.log('변환 결과:', result);
+	        } catch (error) {
+	            console.error('변환 중 오류:', error);
+	        }
+	    });
+	}
+	
+	// 페이지 로드 시 테스트 실행
+	window.addEventListener('load', testDateConversion);
     function initializeDateSelects() {
         yearSelect.innerHTML = '<option value="">년도</option>';
         for (let y = currentYear; y >= 1900; y--) {
@@ -579,6 +599,7 @@
             element.textContent = "해당하는 카드 정보가 없습니다.";
         }
     }
+
 
     yearSelect.addEventListener('change', calculateCards);
     monthSelect.addEventListener('change', calculateCards);
