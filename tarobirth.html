@@ -19,7 +19,7 @@
             margin-top: 20px;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/lunar-calendar@0.0.17/lunar-calendar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/solarlunar@2.0.7/dist/solarlunar.min.js"></script>
 </head>
 <body>
     <h1>타로 생일카드 계산기</h1>
@@ -35,43 +35,51 @@
 
     <script>
         function calculateCards() {
-            const calendarType = document.getElementById('calendarType').value;
-            const year = parseInt(document.getElementById('year').value);
-            const month = parseInt(document.getElementById('month').value);
-            const day = parseInt(document.getElementById('day').value);
+            try {
+                const calendarType = document.getElementById('calendarType').value;
+                const year = parseInt(document.getElementById('year').value);
+                const month = parseInt(document.getElementById('month').value);
+                const day = parseInt(document.getElementById('day').value);
 
-            let solarDate, lunarDate;
+                if (isNaN(year) || isNaN(month) || isNaN(day)) {
+                    throw new Error("올바른 날짜를 입력해주세요.");
+                }
 
-            if (calendarType === 'solar') {
-                solarDate = { year, month, day };
-                lunarDate = LunarCalendar.solarToLunar(year, month, day);
-            } else {
-                lunarDate = { year, month, day };
-                solarDate = LunarCalendar.lunarToSolar(year, month, day);
+                let solarDate, lunarDate;
+
+                if (calendarType === 'solar') {
+                    solarDate = { year, month, day };
+                    lunarDate = solarlunar.solar2lunar(year, month, day);
+                } else {
+                    lunarDate = { year, month, day };
+                    solarDate = solarlunar.lunar2solar(year, month, day);
+                }
+
+                const solarSum = solarDate.year + solarDate.month + solarDate.day;
+                const lunarSum = lunarDate.year + lunarDate.month + lunarDate.day;
+
+                const solarFinalSum = getFinalCard(sumDigits(solarSum));
+                const lunarFinalSum = getFinalCard(sumDigits(lunarSum));
+                
+                const solarCard = solarFinalSum;
+                const lunarCard = lunarFinalSum;
+                const shadowCard = getFinalCard(22 - solarCard);
+                const soulCard = getSoulCard(sumDigits(solarSum));
+
+                const result = `
+                    <h2>결과</h2>
+                    <p>양력 날짜: ${solarDate.year}년 ${solarDate.month}월 ${solarDate.day}일</p>
+                    <p>음력 날짜: ${lunarDate.year}년 ${lunarDate.month}월 ${lunarDate.day}일</p>
+                    <p>양력카드: ${solarCard}번 ${getCardName(solarCard)}</p>
+                    <p>음력카드: ${lunarCard}번 ${getCardName(lunarCard)}</p>
+                    <p>그림자카드: ${shadowCard}번 ${getCardName(shadowCard)}</p>
+                    ${soulCard ? `<p>소울카드: ${soulCard}번 ${getCardName(soulCard)}</p>` : '<p>소울카드: 해당 없음</p>'}
+                `;
+
+                document.getElementById('result').innerHTML = result;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `<p style="color: red;">오류: ${error.message}</p>`;
             }
-
-            const solarSum = solarDate.year + solarDate.month + solarDate.day;
-            const lunarSum = lunarDate.year + lunarDate.month + lunarDate.day;
-
-            const solarFinalSum = getFinalCard(sumDigits(solarSum));
-            const lunarFinalSum = getFinalCard(sumDigits(lunarSum));
-            
-            const solarCard = solarFinalSum;
-            const lunarCard = lunarFinalSum;
-            const shadowCard = getFinalCard(22 - solarCard);
-            const soulCard = getSoulCard(sumDigits(solarSum));
-
-            const result = `
-                <h2>결과</h2>
-                <p>양력 날짜: ${solarDate.year}년 ${solarDate.month}월 ${solarDate.day}일</p>
-                <p>음력 날짜: ${lunarDate.year}년 ${lunarDate.month}월 ${lunarDate.day}일</p>
-                <p>양력카드: ${solarCard}번 ${getCardName(solarCard)}</p>
-                <p>음력카드: ${lunarCard}번 ${getCardName(lunarCard)}</p>
-                <p>그림자카드: ${shadowCard}번 ${getCardName(shadowCard)}</p>
-                ${soulCard ? `<p>소울카드: ${soulCard}번 ${getCardName(soulCard)}</p>` : '<p>소울카드: 해당 없음</p>'}
-            `;
-
-            document.getElementById('result').innerHTML = result;
         }
 
         function sumDigits(num) {
