@@ -152,7 +152,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>생일수 계산기</h1>
+        <h1>타로 생일수 계산기</h1>
         <div id="errorContainer" class="error-message" role="alert"></div>
 
         <div class="input-group">
@@ -335,42 +335,89 @@
             try {
                 loadingElement.style.display = 'block';
                 
-                // CORS 프록시 서버를 통한 요청
-                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-                const apiUrl = `${BASE_URL}/${endpoint}?serviceKey=${API_KEY}&${dateType}Year=${year}&${dateType}Month=${month}&${dateType}Day=${day}`;
+                // API URL 구성
+                const params = new URLSearchParams({
+                    serviceKey: API_KEY,
+                    [`${dateType}Year`]: year,
+                    [`${dateType}Month`]: month.toString().padStart(2, '0'),
+                    [`${dateType}Day`]: day.toString().padStart(2, '0')
+                });
                 
-                const response = await fetch(proxyUrl + apiUrl);
+                const apiUrl = `${BASE_URL}/${endpoint}?${params}`;
+                
+                // CORS 우회를 위한 프록시 URL
+                const proxyUrl = 'https://proxy.cors.sh/';
+                const headers = {
+                    'x-cors-api-key': 'temp_d89c2d8fcfcb079dca45ab5315f80d5d'
+                };
+                
+                const response = await fetch(proxyUrl + apiUrl, { headers });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const text = await response.text();
                 
-                // XML 파싱
+                // XML 파싱 에러 체크
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(text, "text/xml");
                 
-                // 에러 체크
-                const errorCode = xmlDoc.querySelector('resultCode');
-                if (errorCode && errorCode.textContent !== '00') {
-                    const errorMsg = xmlDoc.querySelector('resultMsg');
-                    throw new Error(errorMsg ? errorMsg.textContent : '날짜 변환 실패');
+                if (xmlDoc.getElementsByTagName('parsererror').length > 0) {
+                    throw new Error('XML 파싱 오류가 발생했습니다');
                 }
                 
-                // 결과 파싱
+                // API 응답 에러 체크
+                const errorCode = xmlDoc.querySelector('resultCode');
+                const errorMsg = xmlDoc.querySelector('resultMsg');
+                
+                if (errorCode) {
+                    const code = errorCode.textContent;
+                    if (code !== '00') {
+                        throw new Error(errorMsg ? 
+                            `API 오류: ${errorMsg.textContent} (코드: ${code})` : 
+                            '날짜 변환 실패');
+                    }
+                }
+                
+                // 결과 데이터 추출
                 const item = xmlDoc.querySelector('item');
                 if (!item) {
                     throw new Error('날짜 정보를 찾을 수 없습니다');
                 }
 
-                return {
-                    solar: {
-                        year: parseInt(item.querySelector('solYear').textContent),
-                        month: parseInt(item.querySelector('solMonth').textContent),
-                        day: parseInt(item.querySelector('solDay').textContent)
-                    },
-                    lunar: {
-                        year: parseInt(item.querySelector('lunYear').textContent),
-                        month: parseInt(item.querySelector('lunMonth').textContent),
-                        day: parseInt(item.querySelector('lunDay').textContent)
-                    }
+                // 안전한 데이터 추출을 위한 헬퍼 함수
+                const safeParseInt = (element) => {
+                    if (!element) return null;
+                    const value = parseInt(element.textContent);
+                    return isNaN(value) ? null : value;
                 };
+
+                const getElementText = (parent, selector) => {
+                    const element = parent.querySelector(selector);
+                    return element ? element.textContent : null;
+                };
+
+                // 데이터 추출
+                const solar = {
+                    year: safeParseInt(item.querySelector('solYear')),
+                    month: safeParseInt(item.querySelector('solMonth')),
+                    day: safeParseInt(item.querySelector('solDay'))
+                };
+
+                const lunar = {
+                    year: safeParseInt(item.querySelector('lunYear')),
+                    month: safeParseInt(item.querySelector('lunMonth')),
+                    day: safeParseInt(item.querySelector('lunDay'))
+                };
+
+                // 데이터 유효성 검사
+                if (!solar.year || !solar.month || !solar.day ||
+                    !lunar.year || !lunar.month || !lunar.day) {
+                    throw new Error('날짜 데이터가 올바르지 않습니다');
+                }
+
+                return { solar, lunar };
             } catch (error) {
                 console.error('Error:', error);
                 throw new Error('날짜 변환 중 오류가 발생했습니다: ' + error.message);
