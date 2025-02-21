@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>타로 생일수 계산기</title>
-    <script src="https://cdn.jsdelivr.net/npm/solarlunar@2.0.7/dist/solarlunar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/holiday-kr@0.1.5/index.min.js"></script>
     <style>
         :root {
             --primary-color: #4a90e2;
@@ -201,14 +201,12 @@
             </div>
         </div>
     </div>
-
     <script>
         const yearSelect = document.getElementById('year');
         const monthSelect = document.getElementById('month');
         const daySelect = document.getElementById('day');
-        const errorContainer = document.getElementById('errorContainer');
+		const errorContainer = document.getElementById('errorContainer');
         const currentYear = new Date().getFullYear();
-
         const tarotCards = [
             {
                 name: "마법사(The Magician)",
@@ -319,183 +317,203 @@
                 name: "바보(The Fool)",
                 number: "0",
                 meaning: "순수, 모험, 자유, 무한한 가능성. 자유분방하고 창의적인 성격, 새로운 도전을 즐기는 특성을 가집니다."
-            }
-        ];
+        }
+    ];
 
-        function initializeDateSelects() {
-            yearSelect.innerHTML = '<option value="">년도</option>';
-            for (let y = currentYear; y >= 1900; y--) {
-                yearSelect.innerHTML += `<option value="${y}">${y}년</option>`;
-            }
-
-            monthSelect.innerHTML = '<option value="">월</option>';
-            for (let m = 1; m <= 12; m++) {
-                monthSelect.innerHTML += `<option value="${m.toString().padStart(2, '0')}">${m}월</option>`;
-            }
-
-            updateDays();
+    function initializeDateSelects() {
+        yearSelect.innerHTML = '<option value="">년도</option>';
+        for (let y = currentYear; y >= 1900; y--) {
+            yearSelect.innerHTML += `<option value="${y}">${y}년</option>`;
         }
 
-        function updateDays() {
-            const year = parseInt(yearSelect.value) || currentYear;
-            const month = parseInt(monthSelect.value) || 1;
-            const lastDay = new Date(year, month, 0).getDate();
-
-            daySelect.innerHTML = '<option value="">일</option>';
-            for (let d = 1; d <= lastDay; d++) {
-                daySelect.innerHTML += `<option value="${d.toString().padStart(2, '0')}">${d}일</option>`;
-            }
-
-            if (parseInt(daySelect.value) > lastDay) {
-                daySelect.value = '';
-            }
+        monthSelect.innerHTML = '<option value="">월</option>';
+        for (let m = 1; m <= 12; m++) {
+            monthSelect.innerHTML += `<option value="${m.toString().padStart(2, '0')}">${m}월</option>`;
         }
 
-        function convertDate(year, month, day, isSolar) {
-            try {
-                // 기본 유효성 검사
-                if (year < 1900 || year > 2050 || month < 1 || month > 12 || day < 1 || day > 31) {
-                    throw new Error('날짜 범위가 올바르지 않습니다.');
-                }
-        
-                const monthStr = month.toString().padStart(2, '0');
-                const dayStr = day.toString().padStart(2, '0');
-        
-                if (isSolar) {
-                    // 양력 -> 음력 변환
-                    const lunar = solarLunar.solar2lunar(year, month, day);
-                    
-                    return {
-                        solar: {
-                            year: year,
-                            month: month,
-                            day: day
-                        },
-                        lunar: {
-                            year: lunar.lYear,
-                            month: lunar.lMonth,
-                            day: lunar.lDay
-                        }
-                    };
-                } else {
-                    // 음력 -> 양력 변환
-                    const solar = solarLunar.lunar2solar(year, month, day);
-                    
-                    return {
-                        solar: {
-                            year: solar.cYear,
-                            month: solar.cMonth,
-                            day: solar.cDay
-                        },
-                        lunar: {
-                            year: year,
-                            month: month,
-                            day: day
-                        }
-                    };
-                }
-            } catch (error) {
-                console.error('날짜 변환 중 오류:', error);
-                errorContainer.textContent = '날짜 변환에 실패했습니다. 잠시 후 다시 시도해주세요.';
-                return null;
-            }
+        updateDays();
+    }
+
+    function updateDays() {
+        const year = parseInt(yearSelect.value) || currentYear;
+        const month = parseInt(monthSelect.value) || 1;
+        const lastDay = new Date(year, month, 0).getDate();
+
+        daySelect.innerHTML = '<option value="">일</option>';
+        for (let d = 1; d <= lastDay; d++) {
+            daySelect.innerHTML += `<option value="${d.toString().padStart(2, '0')}">${d}일</option>`;
         }
 
-        function calculateCards() {
-            const year = parseInt(yearSelect.value);
-            const month = parseInt(monthSelect.value);
-            const day = parseInt(daySelect.value);
-            const isSolar = document.querySelector('input[name="calendarType"]:checked').value === 'solar';
-
-            // 날짜 유효성 검사
-            if (!year || !month || !day) {
-                errorContainer.textContent = '년, 월, 일을 모두 선택해주세요.';
-                clearCardInfo();
-                return;
+        if (parseInt(daySelect.value) > lastDay) {
+            daySelect.value = '';
+        }
+    }
+    
+    function convertDate(year, month, day, isSolar) {
+        try {
+            if (isSolar) {
+                // 양력 -> 음력 변환
+                const lunarDate = holidayKR.getLunar(year, month, day);
+                
+                return {
+                    solar: {
+                        year: year,
+                        month: month,
+                        day: day
+                    },
+                    lunar: {
+                        year: lunarDate.year,
+                        month: lunarDate.month,
+                        day: lunarDate.day,
+                        isLeapMonth: lunarDate.leapMonth
+                    }
+                };
+            } else {
+                // 음력 -> 양력 변환
+                const solarDate = holidayKR.getSolar(year, month, day, false);
+                
+                return {
+                    solar: {
+                        year: solarDate.year,
+                        month: solarDate.month,
+                        day: solarDate.day
+                    },
+                    lunar: {
+                        year: year,
+                        month: month,
+                        day: day
+                    }
+                };
             }
+        } catch (error) {
+            console.error('날짜 변환 중 오류:', error);
+            throw new Error('올바르지 않은 날짜입니다. 다시 확인해주세요.');
+        }
+    }
+    
+    // 날짜 유효성 검사 함수 추가
+    function isValidDate(year, month, day) {
+        const date = new Date(year, month - 1, day);
+        return date.getFullYear() === year && 
+               date.getMonth() === month - 1 && 
+               date.getDate() === day;
+    }
+    
+    // 음력 날짜 유효성 검사 함수 개선
+    function isValidLunarDate(year, month, day) {
+        try {
+            // holidayKR를 사용하여 음력 -> 양력 변환 시 유효성 검사
+            holidayKR.getSolar(year, month, day, false);
+            return true; // 변환에 성공하면 유효한 음력 날짜
+        } catch (error) {
+            return false; // 변환에 실패하면 유효하지 않은 음력 날짜
+        }
+    }
 
-            // 날짜 변환
+    function calculateCards() {
+        // 에러 메시지 초기화
+        errorContainer.textContent = '';
+
+        if (!validateInputs()) return;
+
+        const year = parseInt(yearSelect.value);
+        const month = parseInt(monthSelect.value);
+        const day = parseInt(daySelect.value);
+        const isSolar = document.querySelector('input[name="calendarType"]:checked').value === 'solar';
+
+        try {
+            // 음력 날짜일 경우 추가 검증
+            if (!isSolar && !isValidLunarDate(year, month, day)) {
+                throw new Error('올바르지 않은 음력 날짜입니다. 다시 확인해주세요.');
+            }
+    
             const dateInfo = convertDate(year, month, day, isSolar);
-            if (!dateInfo) {
-                clearCardInfo();
-                return;
-            }
-
-            // 양력/음력 날짜 표시 업데이트
-            document.getElementById('solarDate').textContent = `양력: ${dateInfo.solar.year}년 ${dateInfo.solar.month}월 ${dateInfo.solar.day}일`;
-            document.getElementById('lunarDate').textContent = `음력: ${dateInfo.lunar.year}년 ${dateInfo.lunar.month}월 ${dateInfo.lunar.day}일`;
-
+    
+            // 결과 표시 로직 (기존과 동일)
+            document.getElementById('solarDate').textContent = 
+                `양력: ${dateInfo.solar.year}년 ${dateInfo.solar.month}월 ${dateInfo.solar.day}일`;
+            document.getElementById('lunarDate').textContent = 
+                `음력: ${dateInfo.lunar.year}년 ${dateInfo.lunar.month}월 ${dateInfo.lunar.day}일`;
+    
             // 양력 계산
             const solarInitialSum = dateInfo.solar.year + dateInfo.solar.month + dateInfo.solar.day;
             const solarResult = calculateBirthNumber(solarInitialSum);
-
+            
             // 음력 계산
             const lunarInitialSum = dateInfo.lunar.year + dateInfo.lunar.month + dateInfo.lunar.day;
             const lunarResult = calculateBirthNumber(lunarInitialSum);
-
+    
             // 카드 정보 표시
             displayCardInfo('solarCardInfo', solarResult.finalSum);
             displayCardInfo('lunarCardInfo', lunarResult.finalSum);
             displayCardInfo('shadowCardInfo', 22 - solarResult.finalSum);
-
+    
             // 소울 카드: 첫 번째 합계가 22 이상일 때만 계산
             if (solarResult.firstSum >= 22) {
                 displayCardInfo('soulCardInfo', solarResult.firstSum - 22);
             } else {
                 displayCardInfo('soulCardInfo', solarResult.firstSum);
             }
+    
+        } catch (error) {
+            // 에러 메시지 표시
+            errorContainer.textContent = error.message;
+            console.error(error.message);
+        }
+    }
+    
+    function validateInputs() {
+        const year = parseInt(yearSelect.value);
+        const month = parseInt(monthSelect.value);
+        const day = parseInt(daySelect.value);
+        const isSolar = document.querySelector('input[name="calendarType"]:checked').value === 'solar';
+        let isValid = true;
+
+        // 에러 메시지 초기화
+        errorContainer.textContent = '';
+    
+        if (!year || !month || !day) {
+            errorContainer.textContent = '년, 월, 일을 모두 선택해주세요.';
+            isValid = false;
+        } else if (isSolar && !isValidDate(year, month, day)) {
+            errorContainer.textContent = '올바르지 않은 양력 날짜입니다. 다시 확인해주세요.';
+            isValid = false;
+        }
+    
+        return isValid;
+    }
+
+    function calculateBirthNumber(initialSum) {
+        let firstSum = String(initialSum).split('').reduce((acc, digit) => acc + parseInt(digit), 0);
+        let finalSum = firstSum;
+
+        while (finalSum > 22) {
+            finalSum = String(finalSum).split('').reduce((acc, digit) => acc + parseInt(digit), 0);
         }
 
-        function clearCardInfo() {
-            document.getElementById('solarDate').textContent = '양력: -';
-            document.getElementById('lunarDate').textContent = '음력: -';
-            document.getElementById('solarCardInfo').textContent = '';
-            document.getElementById('lunarCardInfo').textContent = '';
-            document.getElementById('shadowCardInfo').textContent = '';
-            document.getElementById('soulCardInfo').textContent = '';
+        return { firstSum: firstSum, finalSum: finalSum };
+    }
+
+    function displayCardInfo(elementId, cardNumber) {
+        const card = tarotCards.find(card => parseInt(card.number) === cardNumber);
+        const element = document.getElementById(elementId);
+
+        if (card) {
+            element.innerHTML = `
+                <div class="card-name">${card.name}</div>
+                <div class="card-meaning">${card.meaning}</div>
+            `;
+        } else {
+            element.textContent = "해당하는 카드 정보가 없습니다.";
         }
+    }
 
-        function calculateBirthNumber(initialSum) {
-            let firstSum = String(initialSum).split('').reduce((acc, digit) => acc + parseInt(digit), 0);
-            let finalSum = firstSum;
+    yearSelect.addEventListener('change', calculateCards);
+    monthSelect.addEventListener('change', calculateCards);
+    daySelect.addEventListener('change', calculateCards);
 
-            while (finalSum > 22) {
-                finalSum = String(finalSum).split('').reduce((acc, digit) => acc + parseInt(digit), 0);
-            }
-
-            return { firstSum: firstSum, finalSum: finalSum };
-        }
-
-        function displayCardInfo(elementId, cardNumber) {
-            const card = tarotCards.find(card => parseInt(card.number) === cardNumber);
-            const element = document.getElementById(elementId);
-
-            if (card) {
-                element.innerHTML = `
-                    <div class="card-name">${card.name}</div>
-                    <div class="card-meaning">${card.meaning}</div>
-                `;
-            } else {
-                element.textContent = "해당하는 카드 정보가 없습니다.";
-            }
-        }
-
-        // 이벤트 리스너 등록
-        yearSelect.addEventListener('change', () => {
-            updateDays();
-            calculateCards();
-        });
-        monthSelect.addEventListener('change', () => {
-            updateDays();
-            calculateCards();
-        });
-        daySelect.addEventListener('change', calculateCards);
-        document.querySelectorAll('input[name="calendarType"]').forEach(radio => {
-            radio.addEventListener('change', calculateCards);
-        });
-
-        // 초기화
-        initializeDateSelects();
-    </script>
+    // Run
+    initializeDateSelects();
+</script>
 </body>
 </html>
