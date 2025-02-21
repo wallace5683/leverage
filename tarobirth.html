@@ -3,210 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>생일수 계산기</title>
-    <script src="https://cdn.jsdelivr.net/npm/solar2lunar/dist/solar2lunar.min.js"></script>
+    <title>타로 카드 계산기</title>
     <style>
-        :root {
-            --primary-color: #4a90e2;
-            --secondary-color: #f5f5f5;
-            --text-color: #333;
-            --border-color: #dee2e6;
-            --error-color: #dc3545;
-            --success-color: #28a745;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 15px;
-            background-color: var(--secondary-color);
-            color: var(--text-color);
-        }
-
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .input-group {
-            margin-bottom: 25px;
-        }
-
-        .radio-group {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .radio-group label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 16px;
-            padding: 8px 16px;
-            background-color: var(--secondary-color);
-            border-radius: 20px;
-            cursor: pointer;
-        }
-
-        .radio-group input[type="radio"] {
-            width: 20px;
-            height: 20px;
-        }
-
-        .date-inputs {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        select {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            background-color: white;
-            -webkit-appearance: none;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
-            background-size: 16px;
-            height: 48px;
-        }
-
-        select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
-        }
-
-        .card-result {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
-        .card {
-            background-color: var(--secondary-color);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-
-        .card h3 {
-            margin-top: 0;
-            color: var(--primary-color);
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 10px;
-            font-size: 18px;
-        }
-
-        .date-display {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 12px;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
         }
 
         .card-name {
-            color: var(--primary-color);
+            font-size: 20px;
             font-weight: bold;
-            margin: 8px 0;
-            font-size: 16px;
         }
 
         .card-meaning {
-            color: #666;
-            font-size: 14px;
-            line-height: 1.5;
-            margin: 8px 0;
+            margin-top: 10px;
+            font-size: 16px;
+            color: #555;
         }
 
-        .error-message {
-            color: var(--error-color);
-            font-size: 14px;
-            text-align: center;
-            margin: 10px 0;
-            padding: 10px;
-            background-color: rgba(220, 53, 69, 0.1);
-            border-radius: 8px;
-            display: none;
+        .tarot-result {
+            margin-top: 20px;
         }
 
-        .error-message:not(:empty) {
-            display: block;
+        .tarot-result div {
+            margin-bottom: 10px;
         }
 
-        @media (min-width: 768px) {
-            .card-result {
-                grid-template-columns: repeat(2, 1fr);
-            }
+        .select-container {
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>타로 생일수 계산기</h1>
-        <div id="errorContainer" class="error-message" role="alert"></div>
+    <h1>타로 카드 계산기</h1>
 
-        <div class="input-group">
-            <div class="radio-group">
-                <label>
-                    <input type="radio" name="calendarType" value="solar" checked>
-                    양력
-                </label>
-                <label>
-                    <input type="radio" name="calendarType" value="lunar">
-                    음력
-                </label>
-            </div>
-
-            <div class="date-inputs">
-                <select id="year" aria-label="년도 선택"></select>
-                <select id="month" aria-label="월 선택"></select>
-                <select id="day" aria-label="일 선택"></select>
-            </div>
-        </div>
-
-        <div class="card-result">
-            <div class="card">
-                <h3>양력 카드</h3>
-                <div class="date-display" id="solarDate">양력: -</div>
-                <div id="solarCardInfo" class="card-info"></div>
-            </div>
-            <div class="card">
-                <h3>음력 카드</h3>
-                <div class="date-display" id="lunarDate">음력: -</div>
-                <div id="lunarCardInfo" class="card-info"></div>
-            </div>
-            <div class="card">
-                <h3>그림자 카드</h3>
-                <div id="shadowCardInfo" class="card-info"></div>
-            </div>
-            <div class="card">
-                <h3>소울 카드</h3>
-                <div id="soulCardInfo" class="card-info"></div>
-            </div>
-        </div>
+    <div class="select-container">
+        <label for="calendarType">날짜 형식 선택:</label>
+        <input type="radio" id="solar" name="calendarType" value="solar" checked> 양력
+        <input type="radio" id="lunar" name="calendarType" value="lunar"> 음력
     </div>
 
+    <div class="select-container">
+        <label for="year">년도:</label>
+        <select id="year"></select>
+    </div>
+
+    <div class="select-container">
+        <label for="month">월:</label>
+        <select id="month"></select>
+    </div>
+
+    <div class="select-container">
+        <label for="day">일:</label>
+        <select id="day"></select>
+    </div>
+
+    <div class="tarot-result">
+        <h3>결과:</h3>
+        <div id="solarDate">양력: -</div>
+        <div id="lunarDate">음력: -</div>
+
+        <div id="solarCardInfo"></div>
+        <div id="lunarCardInfo"></div>
+        <div id="shadowCardInfo"></div>
+        <div id="soulCardInfo"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/solar2lunar/dist/solar2lunar.min.js"></script>
     <script>
-        const yearSelect = document.getElementById('year');
-        const monthSelect = document.getElementById('month');
-        const daySelect = document.getElementById('day');
-        const currentYear = new Date().getFullYear();
+        // 타로 카드 배열
         const tarotCards = [
             {
                 name: "마법사(The Magician)",
@@ -320,191 +186,125 @@
             }
         ];
 
+        // 날짜 관련 변수
+        const yearSelect = document.getElementById('year');
+        const monthSelect = document.getElementById('month');
+        const daySelect = document.getElementById('day');
+
+        // 날짜 선택 초기화
         function initializeDateSelects() {
-            yearSelect.innerHTML = '<option value="">년도</option>';
-            for (let y = currentYear; y >= 1900; y--) {
-                yearSelect.innerHTML += `<option value="${y}">${y}년</option>`;
+            let currentYear = new Date().getFullYear();
+            for (let i = currentYear - 100; i <= currentYear + 1; i++) {
+                let option = document.createElement('option');
+                option.value = i;
+                option.text = i;
+                yearSelect.appendChild(option);
             }
-
-            monthSelect.innerHTML = '<option value="">월</option>';
-            for (let m = 1; m <= 12; m++) {
-                monthSelect.innerHTML += `<option value="${m.toString().padStart(2, '0')}">${m}월</option>`;
-            }
-
+            yearSelect.value = currentYear;
+            updateMonths();
             updateDays();
         }
 
+        // 월 선택 업데이트
+        function updateMonths() {
+            const monthCount = 12;
+            monthSelect.innerHTML = '';
+            for (let i = 1; i <= monthCount; i++) {
+                let option = document.createElement('option');
+                option.value = i;
+                option.text = i;
+                monthSelect.appendChild(option);
+            }
+        }
+
+        // 일 선택 업데이트
         function updateDays() {
-            const year = parseInt(yearSelect.value) || currentYear;
-            const month = parseInt(monthSelect.value) || 1;
-            const lastDay = new Date(year, month, 0).getDate();
-
-            daySelect.innerHTML = '<option value="">일</option>';
-            for (let d = 1; d <= lastDay; d++) {
-                daySelect.innerHTML += `<option value="${d.toString().padStart(2, '0')}">${d}일</option>`;
-            }
-
-            if (parseInt(daySelect.value) > lastDay) {
-                daySelect.value = '';
+            const selectedYear = yearSelect.value;
+            const selectedMonth = monthSelect.value;
+            const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
+            daySelect.innerHTML = '';
+            for (let i = 1; i <= daysInMonth; i++) {
+                let option = document.createElement('option');
+                option.value = i;
+                option.text = i;
+                daySelect.appendChild(option);
             }
         }
 
-        function convertDate(year, month, day, isSolar) {
-            try {
-                if (isSolar) {
-                    // 양력 -> 음력 변환 개선
-                    const solarDate = lunisolar(`${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`);
-                    const lunarDate = solarDate.lunar;
-                    
-                    return {
-                        solar: {
-                            year: year,
-                            month: month,
-                            day: day
-                        },
-                        lunar: {
-                            year: lunarDate.year,
-                            month: lunarDate.month,
-                            day: lunarDate.day
-                        }
-                    };
-                } else {
-                    // 음력 -> 양력 변환
-                    const lunarToSolarDate = lunisolar.lunar(year, month, day);
-                    
-                    return {
-                        solar: {
-                            year: lunarToSolarDate.year,
-                            month: lunarToSolarDate.month,
-                            day: lunarToSolarDate.day
-                        },
-                        lunar: {
-                            year: year,
-                            month: month,
-                            day: day
-                        }
-                    };
-                }
-            } catch (error) {
-                console.error('날짜 변환 중 오류:', error);
-                throw new Error('날짜 변환 중 오류가 발생했습니다. 올바른 날짜를 선택해주세요.');
-            }
-        }
-
+        // 날짜에 해당하는 타로 카드 계산
         function calculateCards() {
-            if (!validateInputs()) return;
-        
-            const year = parseInt(yearSelect.value);
-            const month = parseInt(monthSelect.value);
-            const day = parseInt(daySelect.value);
-            const isSolar = document.querySelector('input[name="calendarType"]:checked').value === 'solar';
-        
-            try {
-                const dateInfo = convertDate(year, month, day, isSolar);
-        
-                // 결과 표시
-                document.getElementById('solarDate').textContent = 
-                    `양력: ${dateInfo.solar.year}년 ${dateInfo.solar.month}월 ${dateInfo.solar.day}일`;
-                document.getElementById('lunarDate').textContent = 
-                    `음력: ${dateInfo.lunar.year}년 ${dateInfo.lunar.month}월 ${dateInfo.lunar.day}일`;
-        
-                // 양력 계산
-                const solarInitialSum = dateInfo.solar.year + dateInfo.solar.month + dateInfo.solar.day;
-                const solarResult = calculateBirthNumber(solarInitialSum);
-                
-                // 음력 계산
-                const lunarInitialSum = dateInfo.lunar.year + dateInfo.lunar.month + dateInfo.lunar.day;
-                const lunarResult = calculateBirthNumber(lunarInitialSum);
-        
-                // 카드 정보 표시
-                displayCardInfo('solarCardInfo', solarResult.finalSum);
-                displayCardInfo('lunarCardInfo', lunarResult.finalSum);
-                displayCardInfo('shadowCardInfo', 22 - solarResult.finalSum);
-        
-                // 소울 카드: 첫 번째 합계가 22 이상일 때만 계산
-                if (solarResult.firstSum >= 22) {
-                    displayCardInfo('soulCardInfo', solarResult.firstSum - 22);
-                } else {
-                    displayCardInfo('soulCardInfo', null);
-                }
-                document.getElementById('errorContainer').textContent = '';
+            const selectedYear = yearSelect.value;
+            const selectedMonth = monthSelect.value;
+            const selectedDay = daySelect.value;
 
-            } catch (error) {
-                console.error('Error in calculateCards:', error);
-                document.getElementById('errorContainer').textContent = error.message;
-                clearDisplays();
-            }
+            const selectedDate = new Date(selectedYear, selectedMonth - 1, selectedDay);
+
+            // 양력 날짜
+            const solarDate = `${selectedYear}년 ${selectedMonth}월 ${selectedDay}일`;
+
+            // 음력 날짜 변환
+            const lunarDate = solar2lunar(selectedYear, selectedMonth, selectedDay);
+            const lunarYear = lunarDate.lunarYear;
+            const lunarMonth = lunarDate.lunarMonth;
+            const lunarDay = lunarDate.lunarDay;
+            const lunarDateString = `${lunarYear}년 ${lunarMonth}월 ${lunarDay}일`;
+
+            // 카드를 계산 (숫자 합 계산)
+            const solarCardNumber = calculateCardNumber(selectedYear, selectedMonth, selectedDay);
+            const lunarCardNumber = calculateCardNumber(lunarYear, lunarMonth, lunarDay);
+
+            // 결과 표시
+            document.getElementById('solarDate').textContent = `양력: ${solarDate}`;
+            document.getElementById('lunarDate').textContent = `음력: ${lunarDateString}`;
+
+            displayCardInfo(solarCardNumber, 'solarCardInfo');
+            displayCardInfo(lunarCardNumber, 'lunarCardInfo');
+
+            // 그림자 카드와 영혼 카드 계산 (생년월일 합)
+            const shadowCardNumber = calculateCardNumber(selectedYear, selectedMonth, selectedDay);
+            const soulCardNumber = calculateCardNumber(selectedYear, selectedMonth, selectedDay);
+
+            displayCardInfo(shadowCardNumber, 'shadowCardInfo');
+            displayCardInfo(soulCardNumber, 'soulCardInfo');
         }
 
-        function validateInputs() {
-            if (!yearSelect.value || !monthSelect.value || !daySelect.value) {
-                document.getElementById('errorContainer').textContent = '년, 월, 일을 모두 선택해주세요.';
-                return false;
-            }
-            return true;
+        // 카드 번호 계산 (생년월일 숫자의 합)
+        function calculateCardNumber(year, month, day) {
+            const dateSum = year + month + day;
+            let cardNumber = dateSum % 22; // 카드 번호는 1~22 사이
+            return cardNumber === 0 ? 22 : cardNumber;
         }
 
-        function calculateBirthNumber(number) {
-            // 생년월일 합계의 각 자리수를 더한 첫 번째 결과
-            const firstSum = String(number).split('').map(Number).reduce((a, b) => a + b, 0);
-            
-            // 21을 초과하는 경우에만 한번 더 각 자리수를 더함
-            if (firstSum > 21) {
-                const finalSum = String(firstSum).split('').map(Number).reduce((a, b) => a + b, 0);
-                return {
-                    firstSum: firstSum,  // 소울 카드 계산용
-                    finalSum: finalSum   // 최종 카드 번호
-                };
-            }
-            
-            return {
-                firstSum: firstSum,
-                finalSum: firstSum
-            };
-        }
-
-        // displayCardInfo 함수 수정
-        function displayCardInfo(elementId, cardNumber) {
-            const cardInfoDiv = document.getElementById(elementId);
-            
-            // 소울 카드이고 숫자가 21 이하인 경우
-            if (elementId === 'soulCardInfo' && cardNumber <= 21) {
+        // 카드 정보 표시
+        function displayCardInfo(cardNumber, cardInfoDivId) {
+            const card = tarotCards[cardNumber - 1];
+            const cardInfoDiv = document.getElementById(cardInfoDivId);
+            if (card) {
                 cardInfoDiv.innerHTML = `
-                    <div class="card-name">해당 없음</div>
-                    <div class="card-meaning">양력 숫자가 21 이하일 경우 소울 카드는 없습니다.</div>
+                    <div class="card-name">${card.name}</div>
+                    <div class="card-meaning">${card.meaning}</div>
                 `;
-                return;
+            } else {
+                cardInfoDiv.innerHTML = '<div class="card-name">잘못된 카드 번호입니다.</div>';
             }
-            
-            const card = tarotCards[(cardNumber - 1 + tarotCards.length) % tarotCards.length];
-            cardInfoDiv.innerHTML = `
-                <div class="card-name">${card.number}. ${card.name}</div>
-                <div class="card-meaning">${card.meaning}</div>
-            `;
         }
 
-        function clearDisplays() {
-            document.getElementById('solarDate').textContent = '양력: -';
-            document.getElementById('lunarDate').textContent = '음력: -';
-            document.getElementById('solarCardInfo').innerHTML = '';
-            document.getElementById('lunarCardInfo').innerHTML = '';
-            document.getElementById('shadowCardInfo').innerHTML = '';
-            document.getElementById('soulCardInfo').innerHTML = '';
-        }
-
-        yearSelect.addEventListener('change', updateDays);
-        monthSelect.addEventListener('change', updateDays);
-
-        // 이벤트 리스너 등록
-        document.querySelectorAll('input[name="calendarType"]').forEach(radio => {
-            radio.addEventListener('change', calculateCards);
+        // 이벤트 리스너 추가
+        document.querySelectorAll('input[name="calendarType"]').forEach(input => {
+            input.addEventListener('change', calculateCards);
         });
-        yearSelect.addEventListener('change', calculateCards);
-        monthSelect.addEventListener('change', calculateCards);
+        yearSelect.addEventListener('change', () => {
+            updateDays();
+            calculateCards();
+        });
+        monthSelect.addEventListener('change', () => {
+            updateDays();
+            calculateCards();
+        });
         daySelect.addEventListener('change', calculateCards);
 
-        initializeDateSelects(); // 페이지 로드 시 초기화
-        calculateCards(); // 초기 카드 계산
+        // 페이지 로드 시 초기화
+        initializeDateSelects();
     </script>
 </body>
 </html>
