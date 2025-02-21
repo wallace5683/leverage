@@ -145,7 +145,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>생일수 계산기</h1>
+        <h1>타로 생일수 계산기</h1>
         <div id="errorContainer" class="error-message" role="alert"></div>
 
         <div class="input-group">
@@ -243,34 +243,70 @@
 
             try {
                 let solarDate, lunarDate;
+        
+                // 날짜 유효성 검사 추가
+                const isValidDate = (y, m, d) => {
+                    const date = new Date(y, m - 1, d);
+                    return date.getFullYear() === y && 
+                           date.getMonth() === m - 1 && 
+                           date.getDate() === d;
+                };
+
+                if (!isValidDate(year, month, day)) {
+                    throw new Error('Invalid date');
+                }
+
                 if (isSolar) {
-                    lunarDate = solarlunar.solar2lunar(year, month, day);
+                    // 양력 -> 음력 변환
+                    const result = solarlunar.solar2lunar(year, month, day);
+                    if (!result) throw new Error('Conversion failed');
+            
+                    lunarDate = result;
                     solarDate = { cYear: year, cMonth: month, cDay: day };
                 } else {
-                    solarDate = solarlunar.lunar2solar(year, month, day, false);
+                    // 음력 -> 양력 변환
+                    const result = solarlunar.lunar2solar(year, month, day, false);
+                    if (!result) throw new Error('Conversion failed');
+            
+                    solarDate = result;
                     lunarDate = { lYear: year, lMonth: month, lDay: day };
                 }
 
-                document.getElementById('solarDate').textContent = `양력: ${solarDate.cYear}년 ${solarDate.cMonth}월 ${solarDate.cDay}일`;
-                document.getElementById('lunarDate').textContent = `음력: ${lunarDate.lYear}년 ${lunarDate.lMonth}월 ${lunarDate.lDay}일`;
+                // 결과 표시
+                document.getElementById('solarDate').textContent = 
+                    `양력: ${solarDate.cYear}년 ${solarDate.cMonth}월 ${solarDate.cDay}일`;
+                document.getElementById('lunarDate').textContent = 
+                    `음력: ${lunarDate.lYear}년 ${lunarDate.lMonth}월 ${lunarDate.lDay}일`;
 
                 const solarSum = calculateSingleDigit(solarDate.cYear + solarDate.cMonth + solarDate.cDay);
+        
+                // 각 카드 정보 표시
                 displayCardInfo('solarCardInfo', solarSum);
-                displayCardInfo('lunarCardInfo', calculateSingleDigit(lunarDate.lYear + lunarDate.lMonth + lunarDate.lDay));
+                displayCardInfo('lunarCardInfo', 
+                    calculateSingleDigit(lunarDate.lYear + lunarDate.lMonth + lunarDate.lDay));
                 displayCardInfo('shadowCardInfo', 22 - solarSum);
-                displayCardInfo('soulCardInfo', solarSum > 21 ? solarSum - 22 : null);
+                displayCardInfo('soulCardInfo', solarSum > 21 ? solarSum - 22 : solarSum);
+
+                // 에러 메시지 초기화
+                document.getElementById('errorContainer').textContent = '';
+        
             } catch (error) {
-                console.error(error);
-                document.getElementById('errorContainer').textContent = '선택한 날짜가 유효하지 않습니다. 다시 확인해주세요.';
-                document.getElementById('solarDate').textContent = '양력: -';
-                document.getElementById('lunarDate').textContent = '음력: -';
-                displayCardInfo('solarCardInfo', null);
-                displayCardInfo('lunarCardInfo', null);
-                displayCardInfo('shadowCardInfo', null);
-                displayCardInfo('soulCardInfo', null);
+                console.error('Date conversion error:', error);
+                document.getElementById('errorContainer').textContent = 
+                    '선택한 날짜가 유효하지 않습니다. 다시 확인해주세요.';
+                clearDisplays();
             }
         }
-
+        
+        function clearDisplays() {
+            document.getElementById('solarDate').textContent = '양력: -';
+            document.getElementById('lunarDate').textContent = '음력: -';
+            displayCardInfo('solarCardInfo', null);
+            displayCardInfo('lunarCardInfo', null);
+            displayCardInfo('shadowCardInfo', null);
+            displayCardInfo('soulCardInfo', null);
+        }
+        
         function calculateSingleDigit(num) {
             return 1 + ((num - 1) % 9);
         }
