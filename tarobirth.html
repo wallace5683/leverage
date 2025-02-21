@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,7 +28,7 @@
             background-color: white;
             padding: 20px;
             border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
@@ -155,6 +156,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>타로 생일수 계산기</h1>
@@ -316,6 +318,106 @@
             }
         ];
 
+        // Function to display error messages
+        function displayError(message) {
+            const errorContainer = document.getElementById('errorContainer');
+            errorContainer.textContent = message;
+        }
+
+        // Function to populate year, month, and day dropdowns
+        function populateDateDropdowns() {
+            const yearSelect = document.getElementById('year');
+            const monthSelect = document.getElementById('month');
+            const daySelect = document.getElementById('day');
+
+            // Populate years (2000 to 2050)
+            for (let i = 2000; i <= 2050; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i + ' 년';
+                yearSelect.appendChild(option);
+            }
+
+            // Populate months
+            for (let i = 1; i <= 12; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i + ' 월';
+                monthSelect.appendChild(option);
+            }
+
+            // Populate days (default to 31, adjust dynamically based on month)
+            for (let i = 1; i <= 31; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i + ' 일';
+                daySelect.appendChild(option);
+            }
+        }
+
+        // Function to update the number of days in the day dropdown based on the selected month and year
+        function updateDaysInMonth() {
+            const year = parseInt(document.getElementById('year').value);
+            const month = parseInt(document.getElementById('month').value);
+            const daySelect = document.getElementById('day');
+
+            // Get the number of days in the selected month
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            // Clear existing options
+            daySelect.innerHTML = '';
+
+            // Add options for each day in the month
+            for (let i = 1; i <= daysInMonth; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i + ' 일';
+                daySelect.appendChild(option);
+            }
+        }
+
+        // Function to calculate the tarot card number
+        function calculateTarotCardNumber(year, month, day) {
+            let sum = 0;
+            year = parseInt(year);
+            month = parseInt(month);
+            day = parseInt(day);
+
+            sum += year;
+            sum += month;
+            sum += day;
+
+            let sumStr = sum.toString();
+            while (sumStr.length > 1) {
+                sum = 0;
+                for (let i = 0; i < sumStr.length; i++) {
+                    sum += parseInt(sumStr[i]);
+                }
+                sumStr = sum.toString();
+            }
+
+            return parseInt(sumStr);
+        }
+
+        // Function to get tarot card information by number
+        function getTarotCardInfo(cardNumber) {
+            return tarotCards.find(card => card.number === cardNumber.toString()) || null;
+        }
+
+        // Function to display tarot card information in the UI
+        function displayTarotCardInfo(cardInfo, elementId) {
+            const cardInfoElement = document.getElementById(elementId);
+            if (cardInfo) {
+                cardInfoElement.innerHTML = `
+                    <div class="card-name">${cardInfo.name}</div>
+                    <div class="card-meaning">${cardInfo.meaning}</div>
+                `;
+            } else {
+                cardInfoElement.innerHTML = '<p>해당하는 타로 카드 정보를 찾을 수 없습니다.</p>';
+            }
+        }
+
+
         // 양력-음력 변환 함수
         function convertSolarToLunar(year, month, day) {
             // 음력 달력 데이터 (1900년부터 2050년까지)
@@ -365,7 +467,7 @@
             function getLunarYearDays(year) {
                 let days = 0;
                 const yearData = lunarMonthDays[year - 1900];
-                
+
                 // 12개월 순회
                 for (let m = 1; m <= 12; m++) {
                     days += (yearData & (1 << (16 - m))) ? 30 : 29;
@@ -423,327 +525,83 @@
                 throw new Error('지원되는 연도 범위를 벗어났습니다.');
             }
 
-            // 기준 날짜 (1900년 1월 31일) 설정
-            const baseDate = new Date(1900, 0, 31);
-
-            // 총 일수 계산
-            const totalDays = calculateLunarDays(year, month, day, isLeapMonth);
-
-            // 양력 날짜 계산
-            const solarDate = new Date(baseDate.getTime() + totalDays * 24 * 60 * 60 * 1000);
-
-            return {
-                year: solarDate.getFullYear(),
-                month: solarDate.getMonth() + 1,
-                day: solarDate.getDate()
-            };
-        }
-
-        // 양력-음력 변환 함수
-        function convertSolarToLunar(year, month, day) {
-            // 음력 달력 데이터 (1900년부터 2050년까지)
-            const lunarMonthDays = [
-                0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2,
-                0x04ae0, 0x0a5b0, 0x0a4d0, 0x0d250, 0x1d255, 0x0b540, 0x0d6a0, 0x0ada2, 0x095b0, 0x14977,
-                0x04970, 0x0a4b0, 0x0b4b5, 0x06a50, 0x06d40, 0x1ab54, 0x02b60, 0x09570, 0x052f2, 0x04970,
-                0x06d50, 0x0d4a0, 0x0ea50, 0x06e95, 0x05ad0, 0x02b60, 0x186e3, 0x092e0, 0x1c8d7, 0x0c950,
-                0x0d4a0, 0x1d8a6, 0x0b550, 0x056a0, 0x1a5b4, 0x025d0, 0x092d0, 0x0d2b2, 0x0a950, 0x0b557,
-                0x06ca0, 0x0b550, 0x15355, 0x04da0, 0x0a5b0, 0x14573, 0x052b0, 0x0a9a8, 0x0e950, 0x06aa0,
-                0x0aea6, 0x0ab50, 0x04b60, 0x0aae4, 0x0a570, 0x05260, 0x0f263, 0x0d950, 0x05b57, 0x056a0,
-                0x096d0, 0x04dd5, 0x04ad0, 0x0a4d0, 0x0d4d4, 0x0d250, 0x0d558, 0x0b540, 0x0b6a0, 0x195a6,
-                0x095b0, 0x049b0, 0x0a974, 0x0a4b0, 0x0b27a, 0x06a50, 0x06d40, 0x0af46, 0x0ab60, 0x09570,
-                0x04af5, 0x04970, 0x064b0, 0x074a3, 0x0ea50, 0x06b58, 0x05ac0, 0x0ab60, 0x096d5, 0x092e0,
-                0x0c960, 0x0d954, 0x0d4a0, 0x0da50, 0x07552, 0x056a0, 0x0abb7, 0x025d0, 0x092d0, 0x0cab5,
-                0x0a950, 0x0b4a0, 0x0baa4, 0x0ad50, 0x055d9, 0x04ba0, 0x0a5b0, 0x15176, 0x052b0, 0x0a930,
-                0x07954, 0x06aa0, 0x0ad50, 0x05b52, 0x04b60, 0x0a6e6, 0x0a4e0, 0x0d260, 0x0ea65, 0x0d530,
-                0x05aa0, 0x076a3, 0x096d0, 0x04bd7, 0x04ad0, 0x0a4d0, 0x1d0b6, 0x0d250, 0x0d520, 0x0dd45,
-                0x0b5a0, 0x056d0, 0x055b2, 0x049b0, 0x0a577, 0x0a4b0, 0x0aa50, 0x1b255, 0x06d20, 0x0ada0,
-                0x14b63, 0x09370, 0x049f8, 0x04970, 0x064b0, 0x168a6, 0x0ea50, 0x06b20, 0x1a6c4, 0x0aae0,
-                0x0a2e0, 0x0d2e3, 0x0c960, 0x0d557, 0x0d4a0, 0x0da50, 0x05d55, 0x056a0, 0x0a6d0, 0x055d4,
-                0x052d0, 0x0a9b8, 0x0a950, 0x0b4a0, 0x0b6a6, 0x0ad50, 0x055a0, 0x0aba4, 0x0a5b0, 0x052b0,
-                0x0b273, 0x0a930, 0x0a4b8, 0x0ad50, 0x0eaa5, 0x04b60, 0x0a570, 0x04d40, 0x0d164, 0x0e950,
-                0x0d4a0, 0x0dc50, 0x0df50, 0x0a950, 0x076d0, 0x055b2, 0x04b60, 0x0a6e6, 0x0a4e0, 0x0d260,
-                0x0ea65, 0x0d530, 0x05aa0, 0x076a3, 0x096d0, 0x04bd7, 0x04ad0, 0x0a4d0, 0x1d0b6, 0x0d250,
-                0x0d520, 0x0dd45, 0x0b5a0, 0x056d0, 0x055b2, 0x049b0, 0x0a577, 0x0a4b0, 0x0aa50, 0x1b255,
-                0x06d20, 0x0ada0, 0x14b63, 0x09370, 0x049f8, 0x04970, 0x064b0, 0x168a6, 0x0ea50, 0x06b20,
-                0x1a6c4, 0x0aae0, 0x0a2e0, 0x0d2e3, 0x0c960, 0x0d557, 0x0d4a0, 0x0da50, 0x05d55, 0x056a0,
-                0x0a6d0, 0x055d4, 0x052d0, 0x0a9b8, 0x0a950, 0x0b4a0, 0x0b6a6, 0x0ad50, 0x055a0, 0x0aba4,
-                0x0a5b0, 0x052b0, 0x0b273, 0x0a930, 0x0a4b8, 0x0ad50, 0x0eaa5, 0x04b60, 0x0a570, 0x04d40,
-                0x0d164, 0x0e950, 0x0d4a0, 0x0dc50, 0x0df50, 0x0a950, 0x076d0, 0x055b2, 0x04b60, 0x0a6e6,
-                0x0a4e0, 0x0d260, 0x0ea65, 0x0d530, 0x05aa0, 0x076a3, 0x096d0, 0x04bd7, 0x04ad0, 0x0a4d0,
-                0x1d0b6, 0x0d250, 0x0d520, 0x0dd45, 0x0b5a0, 0x056d0, 0x055b2, 0x049b0, 0x0a577, 0x0a4b0,
-                0x0aa50, 0x1b255, 0x06d20, 0x0ada0, 0x14b63, 0x09370, 0x049f8, 0x04970, 0x064b0, 0x168a6,
-                0x0ea50, 0x06b20, 0x1a6c4, 0x0aae0, 0x0a2e0, 0x0d2e3, 0x0c960, 0x0d557, 0x0d4a0, 0x0da50,
-                0x05d55, 0x056a0, 0x0a6d0, 0x055d4, 0x052d0, 0x0a9b8, 0x0a950, 0x0b4a0, 0x0b6a6, 0x0ad50,
-                0x055a0, 0x0aba4, 0x0a5b0, 0x052b0, 0x0b273, 0x0a930, 0x0a4b8, 0x0ad50, 0x0eaa5, 0x04b60,
-                0x0a570, 0x04d40, 0x0d164, 0x0e950, 0x0d4a0, 0x0dc50, 0x0df50, 0x0a950
-            ];
-
-            // 윤달 판단 함수
-            function getLeapMonth(year) {
-                return (lunarMonthDays[year - 1900] & 0xf);
-            }
-
-            // 연도의 음력 총 일수 계산
-            function getLunarYearDays(year) {
-                let days = 0;
-                const yearData = lunarMonthDays[year - 1900];
-                
-                // 12개월 순회
-                for (let m = 1; m <= 12; m++) {
-                    days += (yearData & (1 << (16 - m))) ? 30 : 29;
-                }
-
-                // 윤달 확인 및 추가
-                const leapMonth = getLeapMonth(year);
-                if (leapMonth > 0) {
-                    days += (yearData & (1 << (16 - leapMonth))) ? 30 : 29;
-                }
-
-                return days;
-            }
-
-            // 입력 유효성 검사
-            if (year < 1900 || year > 2050) {
-                throw new Error('지원되는 연도 범위를 벗어났습니다.');
-            }
-
-            // 기준 날짜 (1900년 1월 31일) 설정
-            const baseDate = new Date(1900, 0, 31);
-            const inputDate = new Date(year, month - 1, day);
-
-            // 총 일수 계산
-            const totalDays = Math.floor((inputDate - baseDate) / (24 * 60 * 60 * 1000));
-
-            // 음력 연도 및 날짜 계산
-            let lunarYear = 1900;
-            let lunarDays = 0;
-            let monthDays = 0;
-
-            while (lunarDays + getLunarYearDays(lunarYear) <= totalD
-while (lunarDays + getLunarYearDays(lunarYear) <= totalDays) {
-                lunarDays += getLunarYearDays(lunarYear);
-                lunarYear++;
-            }
-
-            // 해당 연도의 남은 일수 계산
-            const remainingDays = totalDays - lunarDays;
-
-            // 월별 일수 계산
-            let lunarMonth = 1;
-            const yearData = lunarMonthDays[lunarYear - 1900];
-            const leapMonth = getLeapMonth(lunarYear);
-            let isLeapMonth = false;
-
-            while (monthDays + ((yearData & (1 << (16 - lunarMonth))) ? 30 : 29) <= remainingDays) {
-                monthDays += (yearData & (1 << (16 - lunarMonth))) ? 30 : 29;
-
-                // 윤달 처리
-                if (lunarMonth === leapMonth) {
-                    if (monthDays + ((yearData & (1 << (16 - lunarMonth))) ? 30 : 29) <= remainingDays) {
-                        monthDays += (yearData & (1 << (16 - lunarMonth))) ? 30 : 29;
-                        isLeapMonth = true;
-                    }
-                }
-
-                lunarMonth++;
-            }
-
-            // 일자 계산
-            const lunarDay = remainingDays - monthDays + 1;
-
-            return {
-                year: lunarYear,
-                month: lunarMonth,
-                day: lunarDay,
-                isLeapMonth: isLeapMonth
-            };
-        }
-
-        // 년도 초기화 함수
-        function initializeDateSelects() {
-            const yearSelect = document.getElementById('year');
-            const monthSelect = document.getElementById('month');
-            const daySelect = document.getElementById('day');
-            const currentYear = new Date().getFullYear();
-        
-            // 년도 옵션 추가 (1900년부터 현재 연도까지)
-            yearSelect.innerHTML = '<option value="">년도</option>';
-            for (let y = currentYear; y >= 1900; y--) {
-                yearSelect.innerHTML += `<option value="${y}">${y}년</option>`;
-            }
-        
-            // 월 옵션 추가
-            monthSelect.innerHTML = '<option value="">월</option>';
-            for (let m = 1; m <= 12; m++) {
-                monthSelect.innerHTML += `<option value="${m.toString().padStart(2, '0')}">${m}월</option>`;
-            }
-        
-            // 일자 업데이트 함수 추가
-            function updateDays() {
-                const year = parseInt(yearSelect.value) || currentYear;
-                const month = parseInt(monthSelect.value) || 1;
-                const lastDay = new Date(year, month, 0).getDate();
-        
-                // 일자 옵션 추가
-                daySelect.innerHTML = '<option value="">일</option>';
-                for (let d = 1; d <= lastDay; d++) {
-                    daySelect.innerHTML += `<option value="${d.toString().padStart(2, '0')}">${d}일</option>`;
-                }
-            }
-        
-            // 이벤트 리스너 추가
-            yearSelect.addEventListener('change', updateDays);
-            monthSelect.addEventListener('change', updateDays);
-        
-            // 라디오 버튼 변경 시 날짜 초기화
-            document.querySelectorAll('input[name="calendarType"]').forEach(radio => {
-                radio.addEventListener('change', () => {
-                    yearSelect.value = '';
-                    monthSelect.value = '';
-                    daySelect.innerHTML = '<option value="">일</option>';
-                    document.getElementById('errorContainer').textContent = '';
-                    
-                    // 결과 카드 초기화
-                    ['solarDate', 'lunarDate', 'solarCardInfo', 'lunarCardInfo', 'shadowCardInfo', 'soulCardInfo'].forEach(id => {
-                        document.getElementById(id).textContent = '';
-                    });
-                });
-            });
-        }
-        
-        // 페이지 로드 시 초기화
-        window.addEventListener('load', initializeDateSelects);
-
-        // 카드 계산 함수
-        function calculateCards() {
-            const errorContainer = document.getElementById('errorContainer');
-            const yearSelect = document.getElementById('year');
-            const monthSelect = document.getElementById('month');
-            const daySelect = document.getElementById('day');
-
-            // 에러 메시지 초기화
-            errorContainer.textContent = '';
-
-            // 입력값 가져오기
-            const year = parseInt(yearSelect.value);
-            const month = parseInt(monthSelect.value);
-            const day = parseInt(daySelect.value);
-            const isSolar = document.querySelector('input[name="calendarType"]:checked').value === 'solar';
-
-            // 입력 유효성 검사
-            if (!year || !month || !day) {
-                errorContainer.textContent = '년, 월, 일을 모두 선택해주세요.';
-                return;
-            }
-
+            let isLeapMonth = false;  // 윤달 여부 (일단은 false로 설정)
             try {
-                let solarYear, solarMonth, solarDay;
-                let lunarYear, lunarMonth, lunarDay, isLeapMonth;
-
-                // 날짜 변환
-                if (isSolar) {
-                    // 양력 -> 음력
-                    const lunarResult = convertSolarToLunar(year, month, day);
-                    solarYear = year;
-                    solarMonth = month;
-                    solarDay = day;
-                    lunarYear = lunarResult.year;
-                    lunarMonth = lunarResult.month;
-                    lunarDay = lunarResult.day;
-                    isLeapMonth = lunarResult.isLeapMonth;
-                } else {
-                    // 음력 -> 양력
-                    const solarResult = convertLunarToSolar(year, month, day);
-                    lunarYear = year;
-                    lunarMonth = month;
-                    lunarDay = day;
-                    isLeapMonth = document.querySelector('input[name="calendarType"]:checked').dataset.isLeapMonth === 'true';
-                    solarYear = solarResult.year;
-                    solarMonth = solarResult.month;
-                    solarDay = solarResult.day;
-                }
-
-                // 양력, 음력 날짜 표시
-                document.getElementById('solarDate').textContent = 
-                    `양력: ${solarYear}년 ${solarMonth}월 ${solarDay}일`;
-                document.getElementById('lunarDate').textContent = 
-                    `음력: ${lunarYear}년 ${lunarMonth}월 ${lunarDay}일${isLeapMonth ? ' (윤월)' : ''}`;
-
-                // 생일수 계산
-                const calculateBirthNumber = (year, month, day) => {
-                    const initialSum = year + month + day;
-                    let sum = String(initialSum)
-                        .split('')
-                        .reduce((acc, digit) => acc + parseInt(digit), 0);
-                    
-                    while (sum > 22) {
-                        sum = String(sum)
-                            .split('')
-                            .reduce((acc, digit) => acc + parseInt(digit), 0);
-                    }
-                    
-                    return { initialSum, finalSum: sum };
-                };
-
-                // 양력 카드 계산
-                const solarCalc = calculateBirthNumber(solarYear, solarMonth, solarDay);
-                const lunarCalc = calculateBirthNumber(lunarYear, lunarMonth, lunarDay);
-
-                // 카드 정보 표시 함수
-                const displayCardInfo = (elementId, cardNumber) => {
-                    const cardInfo = document.getElementById(elementId);
-                    const card = tarotCards.find(c => parseInt(c.number) === cardNumber);
-                    
-                    if (card) {
-                        cardInfo.innerHTML = `
-                            <div class="card-name">${card.name}</div>
-                            <div class="card-meaning">${card.meaning}</div>
-                        `;
-                    } else {
-                        cardInfo.textContent = '카드 정보를 찾을 수 없습니다.';
-                    }
-                };
-
-                // 각 카드 정보 표시
-                displayCardInfo('solarCardInfo', solarCalc.finalSum);
-                displayCardInfo('lunarCardInfo', lunarCalc.finalSum);
-                displayCardInfo('shadowCardInfo', 22 - solarCalc.finalSum);
-
-                // 소울 카드 계산
-                const soulCardNumber = solarCalc.initialSum >= 22 
-                    ? solarCalc.initialSum - 22 
-                    : solarCalc.initialSum;
-                displayCardInfo('soulCardInfo', soulCardNumber);
-
+                let totalLunarDays = calculateLunarDays(year, month, day, isLeapMonth);
+                return totalLunarDays;
             } catch (error) {
-                errorContainer.textContent = error.message;
+                console.error("Lunar conversion error:", error);
+                return null;
             }
         }
 
-        // 라디오 버튼 이벤트 설정
-        document.querySelectorAll('input[name="calendarType"]').forEach(radio => {
-            radio.addEventListener('change', () => {
-                // 라디오 버튼 변경 시 날짜 초기화
-                document.getElementById('year').value = '';
-                document.getElementById('month').value = '';
-                document.getElementById('day').value = '';
-                document.getElementById('errorContainer').textContent = '';
+        // Main function to calculate and display tarot cards
+        function calculateAndDisplayTarotCards() {
+            try {
+                const year = document.getElementById('year').value;
+                const month = document.getElementById('month').value;
+                const day = document.getElementById('day').value;
+
+                // Validate date inputs
+                if (!year || !month || !day) {
+                    throw new Error('날짜를 선택해주세요.');
+                }
+
+                // Calculate solar card
+                const solarCardNumber = calculateTarotCardNumber(year, month, day);
+                const solarCardInfo = getTarotCardInfo(solarCardNumber);
+                displayTarotCardInfo(solarCardInfo, 'solarCardInfo');
+                document.getElementById('solarDate').textContent = `양력: ${year}년 ${month}월 ${day}일`;
                 
-                // 결과 카드 초기화
-                ['solarDate', 'lunarDate', 'solarCardInfo', 'lunarCardInfo', 'shadowCardInfo', 'soulCardInfo'].forEach(id => {
-                    document.getElementById(id).textContent = '';
-                });
-            });
+            // Calculate and display lunar card (if lunar calendar is selected)
+            const calendarType = document.querySelector('input[name="calendarType"]:checked').value;
+            if (calendarType === 'lunar') {
+                try {
+                    const lunarDate = convertSolarToLunar(parseInt(year), parseInt(month), parseInt(day));
+                    // TODO: Implement logic to display lunar date and card
+                    console.log("Lunar Date:", lunarDate); // Placeholder
+                    displayError('음력 계산은 아직 준비 중입니다.');
+                } catch (error) {
+                    displayError(error.message);
+                }
+            }
+
+            // Calculate shadow card
+            const shadowCardNumber = calculateTarotCardNumber(month, day, year);
+            const shadowCardInfo = getTarotCardInfo(shadowCardNumber);
+            displayTarotCardInfo(shadowCardInfo, 'shadowCardInfo');
+
+            // Calculate soul card
+            const soulCardNumber = calculateTarotCardNumber(day, year, month);
+            const soulCardInfo = getTarotCardInfo(soulCardNumber);
+            displayTarotCardInfo(soulCardInfo, 'soulCardInfo');
+
+        } catch (error) {
+            displayError(error.message);
+        }
+    }
+
+    // Event listeners and initialization
+    document.addEventListener('DOMContentLoaded', () => {
+        populateDateDropdowns();
+        updateDaysInMonth(); // Initial population of days
+
+        // Recalculate days when year or month changes
+        document.getElementById('year').addEventListener('change', updateDaysInMonth);
+        document.getElementById('month').addEventListener('change', updateDaysInMonth);
+
+        // Attach event listener to radio buttons
+        const calendarRadios = document.querySelectorAll('input[name="calendarType"]');
+        calendarRadios.forEach(radio => {
+            radio.addEventListener('change', calculateAndDisplayTarotCards);
         });
 
-        // 이벤트 리스너 추가
-        document.getElementById('year').addEventListener('change', calculateCards);
-        document.getElementById('month').addEventListener('change', calculateCards);
-        document.getElementById('day').addEventListener('change', calculateCards);
+        // Event listener for date changes
+        document.getElementById('year').addEventListener('change', calculateAndDisplayTarotCards);
+        document.getElementById('month').addEventListener('change', calculateAndDisplayTarotCards);
+        document.getElementById('day').addEventListener('change', calculateAndDisplayTarotCards);
 
-        // 페이지 로드 시 초기화
-        initializeDateSelects();
-    </script>
-</body>
-</html>
+        // Initial calculation
+        calculateAndDisplayTarotCards();
+    });
+
