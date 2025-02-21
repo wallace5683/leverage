@@ -352,9 +352,10 @@
         function convertDate(year, month, day, isSolar) {
             try {
                 if (isSolar) {
-                    // 양력 -> 음력
-                    const date = lunisolar(`${year}-${month}-${day}`);
-                    const lunar = date.lunar;
+                    // 양력 -> 음력 변환
+                    const solarDate = lunisolar(`${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`);
+                    const lunarDate = solarDate.lunar;
+        
                     return {
                         solar: {
                             year: year,
@@ -362,19 +363,20 @@
                             day: day
                         },
                         lunar: {
-                            year: lunar.year,
-                            month: lunar.month,
-                            day: lunar.day
+                            year: lunarDate.year,
+                            month: lunarDate.month,
+                            day: lunarDate.day
                         }
                     };
                 } else {
-                    // 음력 -> 양력
-                    const date = lunisolar.lunar(year, month, day);
+                    // 음력 -> 양력 변환
+                    const lunarToSolarDate = lunisolar.lunar(year, month, day);
+        
                     return {
                         solar: {
-                            year: date.year,
-                            month: date.month,
-                            day: date.day
+                            year: lunarToSolarDate.year,
+                            month: lunarToSolarDate.month,
+                            day: lunarToSolarDate.day
                         },
                         lunar: {
                             year: year,
