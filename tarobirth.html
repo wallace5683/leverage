@@ -146,7 +146,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>생일수 계산기</h1>
+        <h1>타로 생일수 계산기</h1>
         <div id="errorContainer" class="error-message" role="alert"></div>
 
         <div class="input-group">
@@ -383,7 +383,7 @@
                     calculateSingleDigit(dateInfo.lunar.year + dateInfo.lunar.month + dateInfo.lunar.day));
                 displayCardInfo('shadowCardInfo', 22 - solarSum);
                 displayCardInfo('soulCardInfo', solarSum > 21 ? solarSum - 22 : solarSum);
-
+                
                 document.getElementById('errorContainer').textContent = '';
 
             } catch (error) {
@@ -409,9 +409,20 @@
             return sum;
         }
 
+        // displayCardInfo 함수 수정
         function displayCardInfo(elementId, cardNumber) {
-            const card = tarotCards[(cardNumber - 1 + tarotCards.length) % tarotCards.length];
             const cardInfoDiv = document.getElementById(elementId);
+            
+            // 소울 카드이고 숫자가 21 이하인 경우
+            if (elementId === 'soulCardInfo' && cardNumber <= 21) {
+                cardInfoDiv.innerHTML = `
+                    <div class="card-name">해당 없음</div>
+                    <div class="card-meaning">양력 숫자가 21 이하일 경우 소울 카드는 없습니다.</div>
+                `;
+                return;
+            }
+            
+            const card = tarotCards[(cardNumber - 1 + tarotCards.length) % tarotCards.length];
             cardInfoDiv.innerHTML = `
                 <div class="card-name">${card.name}</div>
                 <div class="card-meaning">${card.meaning}</div>
