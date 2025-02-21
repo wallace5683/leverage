@@ -353,11 +353,9 @@
             try {
                 if (isSolar) {
                     // 양력 -> 음력 변환
-                    const solarDate = lunisolar(`${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`);
-                    const lunarDate = solarDate.lunar;
-        
-                    console.log('디버그 - 입력된 양력 날짜:', `${year}-${month}-${day}`);
-                    console.log('디버그 - 변환된 음력 날짜:', lunarDate);
+                    const dateString = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                    const date = lunisolar(dateString);
+                    const lunar = date.lunar;
         
                     return {
                         solar: {
@@ -366,9 +364,9 @@
                             day: day
                         },
                         lunar: {
-                            year: lunarDate.year,
-                            month: lunarDate.month,
-                            day: lunarDate.day
+                            year: lunar.year,
+                            month: lunar.month,
+                            day: lunar.day
                         }
                     };
                 } else {
