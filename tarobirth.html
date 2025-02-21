@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>타로 생일수 계산기</title>
-    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
-    <script src="https://unpkg.com/lunisolar/lunisolar.js"></script>
+    <title>생일수 계산기</title>
+    <script src="https://cdn.jsdelivr.net/npm/lunisolar@2.0.0/dist/lunisolar.min.js"></script>
     <style>
         :root {
             --primary-color: #4a90e2;
@@ -354,8 +353,7 @@
             try {
                 if (isSolar) {
                     // 양력 -> 음력 변환
-                    const lunarDate = lunisolar.solarToLunar(year, month, day);
-                    
+                    const lunar = Lunisolar.fromGregorian(year, month, day);
                     return {
                         solar: {
                             year: year,
@@ -363,20 +361,19 @@
                             day: day
                         },
                         lunar: {
-                            year: lunarDate.year,
-                            month: lunarDate.month,
-                            day: lunarDate.day
+                            year: lunar.lunar.year,
+                            month: lunar.lunar.month,
+                            day: lunar.lunar.day
                         }
                     };
                 } else {
                     // 음력 -> 양력 변환
-                    const solarDate = lunisolar.lunarToSolar(year, month, day);
-                    
+                    const solar = Lunisolar.fromLunar(year, month, day);
                     return {
                         solar: {
-                            year: solarDate.year,
-                            month: solarDate.month,
-                            day: solarDate.day
+                            year: solar.gregorian.year,
+                            month: solar.gregorian.month,
+                            day: solar.gregorian.day
                         },
                         lunar: {
                             year: year,
