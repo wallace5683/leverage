@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>타로 생일수 계산기</title>
+    <title>생일수 계산기</title>
     <style>
         :root {
             --primary-color: #4a90e2;
@@ -145,7 +145,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>타로 생일수 계산기</h1>
+        <h1>생일수 계산기</h1>
         <div id="errorContainer" class="error-message" role="alert"></div>
 
         <div class="input-group">
@@ -241,14 +241,18 @@
             const day = parseInt(daySelect.value);
             const isSolar = document.querySelector('input[name="calendarType"]:checked').value === 'solar';
 
-            let solarDate, lunarDate;
             try {
+                let solarDate, lunarDate;
                 if (isSolar) {
                     lunarDate = solarlunar.solar2lunar(year, month, day);
                     solarDate = { cYear: year, cMonth: month, cDay: day };
                 } else {
                     solarDate = solarlunar.lunar2solar(year, month, day, false);
                     lunarDate = { lYear: year, lMonth: month, lDay: day };
+                }
+
+                if (!solarDate || !lunarDate) {
+                    throw new Error('날짜 변환에 실패했습니다.');
                 }
 
                 document.getElementById('solarDate').textContent = `양력: ${solarDate.cYear}년 ${solarDate.cMonth}월 ${solarDate.cDay}일`;
@@ -259,7 +263,9 @@
                 displayCardInfo('lunarCardInfo', calculateSingleDigit(lunarDate.lYear + lunarDate.lMonth + lunarDate.lDay));
                 displayCardInfo('shadowCardInfo', 22 - solarSum);
                 displayCardInfo('soulCardInfo', solarSum > 21 ? solarSum - 22 : null);
+
             } catch (error) {
+                console.error(error);
                 document.getElementById('errorContainer').textContent = '선택한 날짜가 유효하지 않습니다. 다시 확인해주세요.';
                 document.getElementById('solarDate').textContent = '양력: -';
                 document.getElementById('lunarDate').textContent = '음력: -';
@@ -275,45 +281,16 @@
         }
 
         function displayCardInfo(id, cardNumber) {
-            const tarotCards = [
-                { number: 1, name: "마법사(The Magician)", meaning: "창조성, 능동성, 새로운 시작" },
-                { number: 2, name: "여사제(The High Priestess)", meaning: "직관, 내면의 지혜, 신비" },
-                { number: 3, name: "여제(The Empress)", meaning: "풍요, 모성애, 창조성" },
-                { number: 4, name: "황제(The Emperor)", meaning: "권위, 안정, 책임감" },
-                { number: 5, name: "교황(The Hierophant)", meaning: "전통, 지혜, 영적 성장" },
-                { number: 6, name: "연인(The Lovers)", meaning: "관계, 조화, 선택" },
-                { number: 7, name: "전차(The Chariot)", meaning: "의지력, 승리, 목표 달성" },
-                { number: 8, name: "힘(Strength)", meaning: "용기, 인내, 내면의 힘" },
-                { number: 9, name: "은둔자(The Hermit)", meaning: "내성적 탐구, 고독, 진리 탐색" },
-                { number: 10, name: "운명의 수레바퀴(The Wheel of Fortune)", meaning: "변화, 운명, 새로운 주기" },
-                { number: 11, name: "정의(Justice)", meaning: "공정성, 균형, 진실" },
-                { number: 12, name: "매달린 사람(The Hanged Man)", meaning: "희생, 관점 변화, 인내" },
-                { number: 13, name: "죽음(Death)", meaning: "끝과 새로운 시작, 변화" },
-                { number: 14, name: "절제(Temperance)", meaning: "조화, 균형, 중용" },
-                { number: 15, name: "악마(The Devil)", meaning: "집착, 물질적 유혹, 억압" },
-                { number: 16, name: "탑(The Tower)", meaning: "갑작스러운 변화, 깨달음" },
-                { number: 17, name: "별(The Star)", meaning: "희망, 영감, 치유" },
-                { number: 18, name: "달(The Moon)", meaning: "환상, 두려움, 잠재의식" },
-                { number: 19, name: "태양(The Sun)", meaning: "성공, 긍정성, 기쁨" },
-                { number: 20, name: "심판(Judgement)", meaning: "각성, 심사숙고, 재탄생" },
-                { number: 21, name: "세계(The World)", meaning: "완성, 성취, 통합" },
-                { number: 0, name: "광대(The Fool)", meaning: "자유, 새로운 모험, 가능성" }
-            ];
+            const tarotCards = ["광대(The Fool)", "마법사(The Magician)", "여사제(The High Priestess)",
+                                "여제(The Empress)", "황제(The Emperor)", "교황(The Hierophant)",
+                                "연인(The Lovers)", "전차(The Chariot)", "힘(Strength)", "은둔자(The Hermit)",
+                                "운명의 수레바퀴(The Wheel of Fortune)", "정의(Justice)", "매달린 사람(The Hanged Man)",
+                                "죽음(Death)", "절제(Temperance)", "악마(The Devil)", "탑(The Tower)",
+                                "별(The Star)", "달(The Moon)", "태양(The Sun)", "심판(Judgement)", "세계(The World)"];
 
             const element = document.getElementById(id);
-            if (cardNumber !== null) {
-                const card = tarotCards.find(c => c.number === cardNumber || (cardNumber === 22 && c.number === 0));
-                if (card) {
-                    element.innerHTML = `
-                        <div class="card-name">${card.number}번 카드: ${card.name}</div>
-                        <div class="card-meaning">${card.meaning}</div>
-                    `;
-                } else {
-                    element.innerHTML = '<div class="card-meaning">해당하는 카드 정보가 없습니다.</div>';
-                }
-            } else {
-                element.innerHTML = '<div class="card-meaning">해당없음</div>';
-            }
+            element.innerHTML = cardNumber !== null ? `<div class="card-name">${cardNumber}번 카드: ${tarotCards[cardNumber]}</div>`
+                                                    : '<div class="card-meaning">해당없음</div>';
         }
 
         document.addEventListener('DOMContentLoaded', () => {
