@@ -180,6 +180,8 @@
             </div>
         </div>
 
+        <button onclick="calculateCards()">계산하기</button>
+
         <div class="card-result">
             <div class="card">
                 <h3>양력 카드</h3>
@@ -392,7 +394,8 @@
                 throw new Error('올바르지 않은 날짜입니다. 다시 확인해주세요.');
             }
         }
-                // 날짜 유효성 검사 함수 추가
+        
+        // 날짜 유효성 검사 함수 추가
         function isValidDate(year, month, day) {
             const date = new Date(year, month - 1, day);
             return date.getFullYear() === year && 
@@ -404,7 +407,7 @@
         function isValidLunarDate(year, month, day) {
             try {
                 // holidayKR를 사용하여 음력 -> 양력 변환 시 유효성 검사
-                const solarDate = holidayKR.getSolar(year, month, day, false);
+                holidayKR.getSolar(year, month, day, false);
                 return true; // 변환에 성공하면 유효한 음력 날짜
             } catch (error) {
                 return false; // 변환에 실패하면 유효하지 않은 음력 날짜
@@ -412,8 +415,9 @@
         }
 
         function calculateCards() {
-             // 에러 메시지 초기화
+            // 에러 메시지 초기화
             errorContainer.textContent = '';
+
             if (!validateInputs()) return;
 
             const year = parseInt(yearSelect.value);
@@ -426,16 +430,15 @@
                 if (!isSolar && !isValidLunarDate(year, month, day)) {
                     throw new Error('올바르지 않은 음력 날짜입니다. 다시 확인해주세요.');
                 }
-        
+
                 const dateInfo = convertDate(year, month, day, isSolar);
-        
+
                 // 결과 표시 로직 (기존과 동일)
                 document.getElementById('solarDate').textContent = 
                     `양력: ${dateInfo.solar.year}년 ${dateInfo.solar.month}월 ${dateInfo.solar.day}일`;
                 document.getElementById('lunarDate').textContent = 
                     `음력: ${dateInfo.lunar.year}년 ${dateInfo.lunar.month}월 ${dateInfo.lunar.day}일`;
 
-        
                 // 양력 계산
                 const solarInitialSum = dateInfo.solar.year + dateInfo.solar.month + dateInfo.solar.day;
                 const solarResult = calculateBirthNumber(solarInitialSum);
@@ -443,19 +446,19 @@
                 // 음력 계산
                 const lunarInitialSum = dateInfo.lunar.year + dateInfo.lunar.month + dateInfo.lunar.day;
                 const lunarResult = calculateBirthNumber(lunarInitialSum);
-        
+
                 // 카드 정보 표시
                 displayCardInfo('solarCardInfo', solarResult.finalSum);
                 displayCardInfo('lunarCardInfo', lunarResult.finalSum);
                 displayCardInfo('shadowCardInfo', 22 - solarResult.finalSum);
-        
+
                 // 소울 카드: 첫 번째 합계가 22 이상일 때만 계산
                 if (solarResult.firstSum >= 22) {
                     displayCardInfo('soulCardInfo', solarResult.firstSum - 22);
                 } else {
                     displayCardInfo('soulCardInfo', solarResult.firstSum);
                 }
-        
+
             } catch (error) {
                 // 에러 메시지 표시
                 errorContainer.textContent = error.message;
@@ -469,10 +472,10 @@
             const day = parseInt(daySelect.value);
             const isSolar = document.querySelector('input[name="calendarType"]:checked').value === 'solar';
             let isValid = true;
-        
-             // 에러 메시지 초기화
+
+            // 에러 메시지 초기화
             errorContainer.textContent = '';
-        
+
             if (!year || !month || !day) {
                 errorContainer.textContent = '년, 월, 일을 모두 선택해주세요.';
                 isValid = false;
@@ -480,7 +483,7 @@
                 errorContainer.textContent = '올바르지 않은 양력 날짜입니다. 다시 확인해주세요.';
                 isValid = false;
             }
-        
+
             return isValid;
         }
 
