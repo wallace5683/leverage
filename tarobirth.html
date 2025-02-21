@@ -145,7 +145,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>생일수 계산기</h1>
+        <h1>타로 생일수 계산기</h1>
         <div id="errorContainer" class="error-message" role="alert"></div>
 
         <div class="input-group">
@@ -241,18 +241,14 @@
             const day = parseInt(daySelect.value);
             const isSolar = document.querySelector('input[name="calendarType"]:checked').value === 'solar';
 
+            let solarDate, lunarDate;
             try {
-                let solarDate, lunarDate;
                 if (isSolar) {
                     lunarDate = solarlunar.solar2lunar(year, month, day);
                     solarDate = { cYear: year, cMonth: month, cDay: day };
                 } else {
                     solarDate = solarlunar.lunar2solar(year, month, day, false);
                     lunarDate = { lYear: year, lMonth: month, lDay: day };
-                }
-
-                if (!solarDate || !lunarDate) {
-                    throw new Error('날짜 변환에 실패했습니다.');
                 }
 
                 document.getElementById('solarDate').textContent = `양력: ${solarDate.cYear}년 ${solarDate.cMonth}월 ${solarDate.cDay}일`;
@@ -263,9 +259,7 @@
                 displayCardInfo('lunarCardInfo', calculateSingleDigit(lunarDate.lYear + lunarDate.lMonth + lunarDate.lDay));
                 displayCardInfo('shadowCardInfo', 22 - solarSum);
                 displayCardInfo('soulCardInfo', solarSum > 21 ? solarSum - 22 : null);
-
             } catch (error) {
-                console.error(error);
                 document.getElementById('errorContainer').textContent = '선택한 날짜가 유효하지 않습니다. 다시 확인해주세요.';
                 document.getElementById('solarDate').textContent = '양력: -';
                 document.getElementById('lunarDate').textContent = '음력: -';
