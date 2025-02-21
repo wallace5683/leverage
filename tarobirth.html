@@ -478,7 +478,7 @@
             
             const card = tarotCards[(cardNumber - 1 + tarotCards.length) % tarotCards.length];
             cardInfoDiv.innerHTML = `
-                <div class="card-name">${card.name} (${card.number}번 카드)</div>
+                <div class="card-name">${card.number}. ${card.name} (${card.name})</div>
                 <div class="card-meaning">${card.meaning}</div>
             `;
         }
