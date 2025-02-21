@@ -188,22 +188,116 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/solarlunar@2.0.7/dist/solarlunar.min.js"></script>
+
     <script>
+        const API_KEY = 'MILYiLsWAQ6xS8wiGu%2B0xnqhHeVSyR0OCXDQGAwVLbjJHK1ZHunwfpiDCFv%2FqZoPfug6onGR%2FVBNmOdaf85n5g%3D%3D';
+        const BASE_URL = 'http://apis.data.go.kr/B090041/openapi/service/LrsrCldInfoService';
+        
         const yearSelect = document.getElementById('year');
         const monthSelect = document.getElementById('month');
         const daySelect = document.getElementById('day');
         const currentYear = new Date().getFullYear();
 
+        const tarotCards = [
+            {
+                name: "광대(The Fool)",
+                meaning: "새로운 시작, 순수함, 자유로움, 모험심. 편견 없이 세상을 바라보는 순수한 영혼의 상태를 의미합니다."
+            },
+            {
+                name: "마법사(The Magician)",
+                meaning: "창의력, 의지력, 숙련된 기술, 자기확신. 자신의 재능과 능력을 최대한 발휘하여 목표를 달성할 수 있음을 의미합니다."
+            },
+            {
+                name: "여사제(The High Priestess)",
+                meaning: "직관, 신비, 내면의 지혜, 잠재의식. 깊은 통찰력과 영적인 지혜를 상징합니다."
+            },
+            {
+                name: "여제(The Empress)",
+                meaning: "풍요, 창조력, 모성, 자연의 순환. 성장과 번영, 풍요로움을 상징합니다."
+            },
+            {
+                name: "황제(The Emperor)",
+                meaning: "권위, 리더십, 안정성, 체계. 질서와 통제, 합리적인 판단력을 상징합니다."
+            },
+            {
+                name: "교황(The Hierophant)",
+                meaning: "전통, 교육, 영적 지도, 종교. 정신적 가치와 전통적인 가르침을 상징합니다."
+            },
+            {
+                name: "연인(The Lovers)",
+                meaning: "사랑, 조화, 관계, 선택. 중요한 결정과 진정한 파트너십을 상징합니다."
+            },
+            {
+                name: "전차(The Chariot)",
+                meaning: "성공, 의지력, 승리, 전진. 목표를 향한 강한 의지와 추진력을 상징합니다."
+            },
+            {
+                name: "힘(Strength)",
+                meaning: "내면의 힘, 용기, 인내, 자제력. 정신적 강인함과 내면의 힘을 상징합니다."
+            },
+            {
+                name: "은둔자(The Hermit)",
+                meaning: "성찰, 고독, 내면의 탐색, 지혜. 자기 성찰과 내적 성장을 상징합니다."
+            },
+            {
+                name: "운명의 수레바퀴(The Wheel of Fortune)",
+                meaning: "변화, 운명, 기회, 순환. 인생의 변화와 새로운 기회를 상징합니다."
+            },
+            {
+                name: "정의(Justice)",
+                meaning: "균형, 공정, 진실, karma. 공정한 판단과 균형 잡힌 결정을 상징합니다."
+            },
+            {
+                name: "매달린 사람(The Hanged Man)",
+                meaning: "희생, 새로운 관점, 영적 깨달음. 기존 관점에서 벗어나 새로운 시각을 얻는 것을 상징합니다."
+            },
+            {
+                name: "죽음(Death)",
+                meaning: "변화, 종료, 변환, 재생. 큰 변화와 새로운 시작을 상징합니다."
+            },
+            {
+                name: "절제(Temperance)",
+                meaning: "균형, 조화, 중용, 치유. 조화로운 삶과 내면의 평화를 상징합니다."
+            },
+            {
+                name: "악마(The Devil)",
+                meaning: "집착, 속박, 유혹, 물질주의. 자신을 구속하는 부정적인 패턴이나 집착을 상징합니다."
+            },
+            {
+                name: "탑(The Tower)",
+                meaning: "급격한 변화, 파괴, 각성, 해방. 기존 구조의 붕괴와 새로운 시작을 상징합니다."
+            },
+            {
+                name: "별(The Star)",
+                meaning: "희망, 영감, 평화, 치유. 밝은 미래에 대한 희망과 영감을 상징합니다."
+            },
+            {
+                name: "달(The Moon)",
+                meaning: "환상, 직관, 불확실성, 잠재의식. 내면의 두려움과 직관적 통찰을 상징합니다."
+            },
+            {
+                name: "태양(The Sun)",
+                meaning: "기쁨, 성공, 활력, 명료함. 긍정적 에너지와 성공을 상징합니다."
+            },
+            {
+                name: "심판(Judgement)",
+                meaning: "재생, 각성, 변화, 소명. 인생의 새로운 단계와 소명을 발견함을 상징합니다."
+            },
+            {
+                name: "세계(The World)",
+                meaning: "완성, 성취, 통합, 여행. 목표 달성과 완성을 상징합니다."
+            }
+        ];
+
         function initializeDateSelects() {
             yearSelect.innerHTML = '<option value="">년도</option>';
-            for (let y = currentYear; y >= 1900; y--) { // 년도를 내림차순으로 변경
+            for (let y = currentYear; y >= 1900; y--) {
                 yearSelect.innerHTML += `<option value="${y}">${y}년</option>`;
             }
 
             monthSelect.innerHTML = '<option value="">월</option>';
             for (let m = 1; m <= 12; m++) {
-                monthSelect.innerHTML += `<option value="${m}">${m}월</option>`;
+                monthSelect.innerHTML += `<option value="${m.toString().padStart(2, '0')}">${m}월</option>`;
             }
 
             updateDays();
@@ -216,11 +310,86 @@
 
             daySelect.innerHTML = '<option value="">일</option>';
             for (let d = 1; d <= lastDay; d++) {
-                daySelect.innerHTML += `<option value="${d}">${d}일</option>`;
+                daySelect.innerHTML += `<option value="${d.toString().padStart(2, '0')}">${d}일</option>`;
             }
 
             if (parseInt(daySelect.value) > lastDay) {
                 daySelect.value = '';
+            }
+        }
+
+        async function convertDate(year, month, day, isSolar) {
+            const endpoint = isSolar ? 'getLunCalInfo' : 'getSolCalInfo';
+            const dateType = isSolar ? 'sol' : 'lun';
+            
+            try {
+                const url = `${BASE_URL}/${endpoint}?serviceKey=${API_KEY}&${dateType}Year=${year}&${dateType}Month=${month}&${dateType}Day=${day}`;
+                const response = await fetch(url);
+                const text = await response.text();
+                
+                // XML 파싱
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(text, "text/xml");
+                
+                // 에러 체크
+                const errorCode = xmlDoc.querySelector('resultCode');
+                if (errorCode && errorCode.textContent !== '00') {
+                    const errorMsg = xmlDoc.querySelector('resultMsg');
+                    throw new Error(errorMsg ? errorMsg.textContent : '날짜 변환 실패');
+                }
+                
+                // 결과 파싱
+                const item = xmlDoc.querySelector('item');
+                if (!item) {
+                    throw new Error('날짜 정보를 찾을 수 없습니다');
+                }
+
+                return {
+                    solar: {
+                        year: parseInt(item.querySelector('solYear').textContent),
+                        month: parseInt(item.querySelector('solMonth').textContent),
+                        day: parseInt(item.querySelector('solDay').textContent)
+                    }
+                };
+            } catch (error) {
+                console.error('Error:', error);
+                throw new Error('날짜 변환 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+
+        async function calculateCards() {
+            if (!validateInputs()) return;
+
+            const year = yearSelect.value;
+            const month = monthSelect.value;
+            const day = daySelect.value;
+            const isSolar = document.querySelector('input[name="calendarType"]:checked').value === 'solar';
+
+            try {
+                const dateInfo = await convertDate(year, month, day, isSolar);
+                
+                // 결과 표시
+                document.getElementById('solarDate').textContent = 
+                    `양력: ${dateInfo.solar.year}년 ${dateInfo.solar.month}월 ${dateInfo.solar.day}일`;
+                document.getElementById('lunarDate').textContent = 
+                    `음력: ${dateInfo.lunar.year}년 ${dateInfo.lunar.month}월 ${dateInfo.lunar.day}일`;
+
+                const solarSum = calculateSingleDigit(
+                    dateInfo.solar.year + dateInfo.solar.month + dateInfo.solar.day
+                );
+                
+                // 각 카드 정보 표시
+                displayCardInfo('solarCardInfo', solarSum);
+                displayCardInfo('lunarCardInfo', 
+                    calculateSingleDigit(dateInfo.lunar.year + dateInfo.lunar.month + dateInfo.lunar.day));
+                displayCardInfo('shadowCardInfo', 22 - solarSum);
+                displayCardInfo('soulCardInfo', solarSum > 21 ? solarSum - 22 : solarSum);
+
+                document.getElementById('errorContainer').textContent = '';
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('errorContainer').textContent = error.message;
+                clearDisplays();
             }
         }
 
@@ -233,72 +402,6 @@
             return true;
         }
 
-        function calculateCards() {
-            if (!validateInputs()) return;
-        
-            const year = parseInt(yearSelect.value);
-            const month = parseInt(monthSelect.value);
-            const day = parseInt(daySelect.value);
-            const isSolar = document.querySelector('input[name="calendarType"]:checked').value === 'solar';
-        
-            try {
-                let solarDate, lunarDate;
-                
-                // 날짜 유효성 검사 추가
-                const isValidDate = (y, m, d) => {
-                    const date = new Date(y, m - 1, d);
-                    return date.getFullYear() === y && 
-                           date.getMonth() === m - 1 && 
-                           date.getDate() === d;
-                };
-        
-                if (!isValidDate(year, month, day)) {
-                    throw new Error('Invalid date');
-                }
-        
-                if (isSolar) {
-                    // 양력 -> 음력 변환
-                    const result = solarlunar.solar2lunar(year, month, day);
-                    console.log('Conversion result:', result); // 디버깅을 위한 로그 추가
-                    if (!result) throw new Error('Conversion failed');
-                    
-                    lunarDate = result;
-                    solarDate = { cYear: year, cMonth: month, cDay: day };
-                } else {
-                    // 음력 -> 양력 변환
-                    const result = solarlunar.lunar2solar(year, month, day, false);
-                    if (!result) throw new Error('Conversion failed');
-                    
-                    solarDate = result;
-                    lunarDate = { lYear: year, lMonth: month, lDay: day };
-                }
-        
-                // 결과 표시
-                document.getElementById('solarDate').textContent = 
-                    `양력: ${solarDate.cYear}년 ${solarDate.cMonth}월 ${solarDate.cDay}일`;
-                document.getElementById('lunarDate').textContent = 
-                    `음력: ${lunarDate.lYear}년 ${lunarDate.lMonth}월 ${lunarDate.lDay}일`;
-        
-                const solarSum = calculateSingleDigit(solarDate.cYear + solarDate.cMonth + solarDate.cDay);
-                
-                // 각 카드 정보 표시
-                displayCardInfo('solarCardInfo', solarSum);
-                displayCardInfo('lunarCardInfo', 
-                    calculateSingleDigit(lunarDate.lYear + lunarDate.lMonth + lunarDate.lDay));
-                displayCardInfo('shadowCardInfo', 22 - solarSum);
-                displayCardInfo('soulCardInfo', solarSum > 21 ? solarSum - 22 : solarSum);
-        
-                // 에러 메시지 초기화
-                document.getElementById('errorContainer').textContent = '';
-                
-            } catch (error) {
-                console.error('Date conversion error:', error);
-                document.getElementById('errorContainer').textContent = 
-                    '선택한 날짜가 유효하지 않습니다. 다시 확인해주세요.';
-                clearDisplays();
-            }
-        }
-        
         function clearDisplays() {
             document.getElementById('solarDate').textContent = '양력: -';
             document.getElementById('lunarDate').textContent = '음력: -';
@@ -307,22 +410,23 @@
             displayCardInfo('shadowCardInfo', null);
             displayCardInfo('soulCardInfo', null);
         }
-        
+
         function calculateSingleDigit(num) {
             return 1 + ((num - 1) % 9);
         }
 
         function displayCardInfo(id, cardNumber) {
-            const tarotCards = ["광대(The Fool)", "마법사(The Magician)", "여사제(The High Priestess)",
-                                "여제(The Empress)", "황제(The Emperor)", "교황(The Hierophant)",
-                                "연인(The Lovers)", "전차(The Chariot)", "힘(Strength)", "은둔자(The Hermit)",
-                                "운명의 수레바퀴(The Wheel of Fortune)", "정의(Justice)", "매달린 사람(The Hanged Man)",
-                                "죽음(Death)", "절제(Temperance)", "악마(The Devil)", "탑(The Tower)",
-                                "별(The Star)", "달(The Moon)", "태양(The Sun)", "심판(Judgement)", "세계(The World)"];
-
             const element = document.getElementById(id);
-            element.innerHTML = cardNumber !== null ? `<div class="card-name">${cardNumber}번 카드: ${tarotCards[cardNumber]}</div>`
-                                                    : '<div class="card-meaning">해당없음</div>';
+            if (cardNumber === null) {
+                element.innerHTML = '<div class="card-meaning">해당없음</div>';
+                return;
+            }
+            
+            const card = tarotCards[cardNumber];
+            element.innerHTML = `
+                <div class="card-name">${cardNumber}번 카드: ${card.name}</div>
+                <div class="card-meaning">${card.meaning}</div>
+            `;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -330,8 +434,6 @@
             yearSelect.addEventListener('change', () => { updateDays(); calculateCards(); });
             monthSelect.addEventListener('change', () => { updateDays(); calculateCards(); });
             daySelect.addEventListener('change', calculateCards);
-            document.querySelectorAll('input[name="calendarType"]').forEach(radio => radio.addEventListener('change', calculateCards));
-        });
-    </script>
-</body>
-</html>
+            document.querySelectorAll('input[name="calendarType"]').forEach(radio => 
+                radio.addEventListener('change', calculateCards));
+        });,
