@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>타로 생일수 계산기</title>
+    <title>생일수 계산기</title>
     <script src="https://cdn.jsdelivr.net/npm/holiday-kr@0.1.5/index.min.js"></script>
     <style>
         :root {
@@ -179,8 +179,6 @@
                 <select id="day" aria-label="일 선택"></select>
             </div>
         </div>
-
-        <button onclick="calculateCards()">계산하기</button>
 
         <div class="card-result">
             <div class="card">
@@ -418,7 +416,10 @@
             // 에러 메시지 초기화
             errorContainer.textContent = '';
 
-            if (!validateInputs()) return;
+            if (!validateInputs()) {
+                clearCardInfo(); // 유효하지 않은 입력 시 카드 정보 초기화
+                return;
+            }
 
             const year = parseInt(yearSelect.value);
             const month = parseInt(monthSelect.value);
@@ -465,7 +466,7 @@
                 console.error(error.message);
             }
         }
-        
+
         function validateInputs() {
             const year = parseInt(yearSelect.value);
             const month = parseInt(monthSelect.value);
@@ -477,14 +478,25 @@
             errorContainer.textContent = '';
 
             if (!year || !month || !day) {
-                errorContainer.textContent = '년, 월, 일을 모두 선택해주세요.';
                 isValid = false;
             } else if (isSolar && !isValidDate(year, month, day)) {
                 errorContainer.textContent = '올바르지 않은 양력 날짜입니다. 다시 확인해주세요.';
                 isValid = false;
+            } else if (!isSolar && !isValidLunarDate(year, month, day)) {
+                errorContainer.textContent = '올바르지 않은 음력 날짜입니다. 다시 확인해주세요.';
+                isValid = false;
             }
 
             return isValid;
+        }
+        
+        function clearCardInfo() {
+            document.getElementById('solarDate').textContent = '양력: -';
+            document.getElementById('lunarDate').textContent = '음력: -';
+            document.getElementById('solarCardInfo').textContent = '';
+            document.getElementById('lunarCardInfo').textContent = '';
+            document.getElementById('shadowCardInfo').textContent = '';
+            document.getElementById('soulCardInfo').textContent = '';
         }
 
         function calculateBirthNumber(initialSum) {
@@ -512,11 +524,20 @@
             }
         }
 
-        yearSelect.addEventListener('change', updateDays);
-        monthSelect.addEventListener('change', updateDays);
+        yearSelect.addEventListener('change', () => {
+            updateDays();
+            calculateCards();
+        });
+        monthSelect.addEventListener('change', () => {
+            updateDays();
+            calculateCards();
+        });
+        daySelect.addEventListener('change', calculateCards);
 
         // Run
-        initializeDateSelects();
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDateSelects();
+        });
     </script>
 </body>
 </html>
