@@ -145,7 +145,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>타로 생일수 계산기</h1>
+        <h1>생일수 계산기</h1>
         <div id="errorContainer" class="error-message" role="alert"></div>
 
         <div class="input-group">
@@ -197,7 +197,7 @@
 
         function initializeDateSelects() {
             yearSelect.innerHTML = '<option value="">년도</option>';
-            for (let y = currentYear; y >= 1900; y--) {
+            for (let y = currentYear; y >= 1900; y--) { // 년도를 내림차순으로 변경
                 yearSelect.innerHTML += `<option value="${y}">${y}년</option>`;
             }
 
@@ -241,8 +241,8 @@
             const day = parseInt(daySelect.value);
             const isSolar = document.querySelector('input[name="calendarType"]:checked').value === 'solar';
 
-            let solarDate, lunarDate;
             try {
+                let solarDate, lunarDate;
                 if (isSolar) {
                     lunarDate = solarlunar.solar2lunar(year, month, day);
                     solarDate = { cYear: year, cMonth: month, cDay: day };
@@ -260,6 +260,7 @@
                 displayCardInfo('shadowCardInfo', 22 - solarSum);
                 displayCardInfo('soulCardInfo', solarSum > 21 ? solarSum - 22 : null);
             } catch (error) {
+                console.error(error);
                 document.getElementById('errorContainer').textContent = '선택한 날짜가 유효하지 않습니다. 다시 확인해주세요.';
                 document.getElementById('solarDate').textContent = '양력: -';
                 document.getElementById('lunarDate').textContent = '음력: -';
