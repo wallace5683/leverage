@@ -356,6 +356,10 @@
                     const solarDate = lunisolar(`${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`);
                     const lunarDate = solarDate.lunar;
         
+                    // 음력 월이 12를 초과하지 않도록 보정
+                    const fixedLunarMonth = lunarDate.month > 12 ? (lunarDate.month % 12 || 12) : lunarDate.month;
+                    const fixedLunarYear = lunarDate.month > 12 ? (lunarDate.year + Math.floor((lunarDate.month - 1) / 12)) : lunarDate.year;
+        
                     return {
                         solar: {
                             year: year,
@@ -363,8 +367,8 @@
                             day: day
                         },
                         lunar: {
-                            year: lunarDate.year,
-                            month: lunarDate.month,
+                            year: fixedLunarYear,
+                            month: fixedLunarMonth,
                             day: lunarDate.day
                         }
                     };
@@ -478,7 +482,7 @@
             
             const card = tarotCards[(cardNumber - 1 + tarotCards.length) % tarotCards.length];
             cardInfoDiv.innerHTML = `
-                <div class="card-name">${card.number}. ${card.name} (${card.name})</div>
+                <div class="card-name">${card.number}. ${card.name}</div>
                 <div class="card-meaning">${card.meaning}</div>
             `;
         }
