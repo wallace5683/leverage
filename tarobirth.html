@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>타로 생일수 계산기</title>
     <style>
+        /* 기존의 전체 스타일 유지 */
         :root {
             --primary-color: #4a90e2;
             --secondary-color: #f5f5f5;
@@ -24,21 +24,77 @@
             color: var(--text-color);
         }
 
+        /* 커스텀 드롭다운 스타일 추가 */
+        .custom-select {
+            position: relative;
+            width: 100%;
+        }
+
+        .select-selected {
+            background-color: white;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.3s ease;
+            font-size: 16px;
+        }
+
+        .select-selected:hover {
+            border-color: var(--primary-color);
+        }
+
+        .select-selected::after {
+            content: '▼';
+            color: var(--primary-color);
+            font-size: 12px;
+        }
+
+        .select-items {
+            position: absolute;
+            background-color: white;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 99;
+            border: 2px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .select-items div {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .select-items div:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .select-hide {
+            display: none;
+        }
+
+        /* 기존의 나머지 스타일 유지 */
         .container {
             background-color: white;
             padding: 20px;
             border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         h1 {
             font-size: 24px;
             margin-bottom: 20px;
             text-align: center;
-        }
-
-        .input-group {
-            margin-bottom: 25px;
         }
 
         .radio-group {
@@ -71,33 +127,6 @@
             margin: 15px 0;
         }
 
-        select {
-            width: 100%;
-            padding: 12px 40px 12px 15px; /* 오른쪽 패딩 증가 */
-            font-size: 16px;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            background-color: white;
-            appearance: none; /* 브라우저 기본 드롭다운 제거 */
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234a90e2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 20px;
-            cursor: pointer; /* 포인터 커서 추가 */
-            transition: all 0.3s ease; /* 부드러운 전환 효과 */
-        }
-        
-        select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
-        }
-        
-        select:hover {
-            border-color: var(--primary-color);
-        }
         .card-result {
             display: grid;
             grid-template-columns: 1fr;
@@ -117,12 +146,6 @@
             border-bottom: 2px solid var(--border-color);
             padding-bottom: 10px;
             font-size: 18px;
-        }
-
-        .date-display {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 12px;
         }
 
         .card-name {
@@ -161,28 +184,36 @@
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <h1>타로 생일수 계산기</h1>
         <div id="errorContainer" class="error-message" role="alert"></div>
 
-        <div class="input-group">
-            <div class="radio-group">
-                <label>
-                    <input type="radio" name="calendarType" value="solar" checked>
-                    양력
-                </label>
-                <label>
-                    <input type="radio" name="calendarType" value="lunar">
-                    음력
-                </label>
+        <div class="radio-group">
+            <label>
+                <input type="radio" name="calendarType" value="solar" checked>
+                양력
+            </label>
+            <label>
+                <input type="radio" name="calendarType" value="lunar">
+                음력
+            </label>
+        </div>
+
+        <div class="date-inputs">
+            <div class="custom-select">
+                <div class="select-selected">년도</div>
+                <div class="select-items select-hide"></div>
             </div>
 
-            <div class="date-inputs">
-                <select id="year" aria-label="년도 선택"></select>
-                <select id="month" aria-label="월 선택"></select>
-                <select id="day" aria-label="일 선택"></select>
+            <div class="custom-select">
+                <div class="select-selected">월</div>
+                <div class="select-items select-hide"></div>
+            </div>
+
+            <div class="custom-select">
+                <div class="select-selected">일</div>
+                <div class="select-items select-hide"></div>
             </div>
         </div>
 
@@ -586,27 +617,103 @@
         }
     }
 
-    // Event listeners and initialization
-    document.addEventListener('DOMContentLoaded', () => {
-        populateDateDropdowns();
-        updateDaysInMonth(); // Initial population of days
+        // 커스텀 드롭다운 JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            const customSelects = document.querySelectorAll('.custom-select');
+            
+            customSelects.forEach(function(customSelect) {
+                const selectSelected = customSelect.querySelector('.select-selected');
+                const selectItems = customSelect.querySelector('.select-items');
 
-        // Recalculate days when year or month changes
-        document.getElementById('year').addEventListener('change', updateDaysInMonth);
-        document.getElementById('month').addEventListener('change', updateDaysInMonth);
+        // 년도, 월, 일 초기화 함수 내부
+        function initializeOptions(type) {
+            selectItems.innerHTML = ''; // 기존 옵션 지우기
+            
+            let options = [];
+            if (type === 'year') {
+                const currentYear = new Date().getFullYear();
+                options = Array.from({length: currentYear - 1900 + 1}, (_, i) => currentYear - i);
+            } else if (type === 'month') {
+                options = Array.from({length: 12}, (_, i) => i + 1);
+            } else if (type === 'day') {
+                // 년도와 월 선택 여부 확인
+                const yearSelect = document.querySelector('.custom-select:first-child .select-selected');
+                const monthSelect = document.querySelector('.custom-select:nth-child(2) .select-selected');
+                
+                if (yearSelect.textContent.includes('년') && monthSelect.textContent.includes('월')) {
+                    const year = parseInt(yearSelect.textContent);
+                    const month = parseInt(monthSelect.textContent);
+                    const lastDay = new Date(year, month, 0).getDate();
+                    options = Array.from({length: lastDay}, (_, i) => i + 1);
+                }
+            }
+        
+            options.forEach(option => {
+                const div = document.createElement('div');
+                div.textContent = type === 'year' ? `${option}년` : 
+                                  type === 'month' ? `${option}월` : 
+                                  `${option}일`;
+                div.addEventListener('click', function() {
+                    selectSelected.textContent = this.textContent;
+                    selectItems.classList.add('select-hide');
+                    
+                    // 날짜 선택 시 카드 계산 트리거
+                    if (type === 'day') {
+                        calculateAndDisplayTarotCards(); // 수정된 부분
+                    }
+                });
+                selectItems.appendChild(div);
+            });
+        }
 
-        // Attach event listener to radio buttons
-        const calendarRadios = document.querySelectorAll('input[name="calendarType"]');
-        calendarRadios.forEach(radio => {
-            radio.addEventListener('change', calculateAndDisplayTarotCards);
+                // 클릭 이벤트
+                selectSelected.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // 다른 드롭다운 닫기
+                    document.querySelectorAll('.select-items').forEach(items => {
+                        if (items !== selectItems) {
+                            items.classList.add('select-hide');
+                        }
+                    });
+
+                    // 년도, 월, 일에 따라 다른 초기화
+                    if (this.textContent === '년도') {
+                        initializeOptions('year');
+                    } else if (this.textContent === '월') {
+                        initializeOptions('month');
+                    } else if (this.textContent === '일') {
+                        initializeOptions('day');
+                    }
+
+                    selectItems.classList.toggle('select-hide');
+                });
+            });
+
+            // 전체 문서에 클릭 이벤트 추가하여 드롭다운 닫기
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.select-items').forEach(items => {
+                    items.classList.add('select-hide');
+                });
+            });
+
+            // 라디오 버튼 변경 시 초기화
+            document.querySelectorAll('input[name="calendarType"]').forEach(radio => {
+                radio.addEventListener('change', () => {
+                    // 모든 드롭다운 초기화
+                    document.querySelectorAll('.select-selected').forEach(selected => {
+                        if (selected.closest('.custom-select').querySelector('.select-selected').textContent !== '년도') {
+                            selected.textContent = selected.closest('.custom-select').querySelector('.select-selected').textContent === '월' ? '월' : '일';
+                        }
+                    });
+
+                    // 결과 카드 초기화
+                    ['solarDate', 'lunarDate', 'solarCardInfo', 'lunarCardInfo', 'shadowCardInfo', 'soulCardInfo'].forEach(id => {
+                        document.getElementById(id).textContent = '';
+                    });
+                });
+            });
         });
-
-        // Event listener for date changes
-        document.getElementById('year').addEventListener('change', calculateAndDisplayTarotCards);
-        document.getElementById('month').addEventListener('change', calculateAndDisplayTarotCards);
-        document.getElementById('day').addEventListener('change', calculateAndDisplayTarotCards);
-
-        // Initial calculation
-        calculateAndDisplayTarotCards();
-    });
-
+    </script>
+</body>
+</html>
