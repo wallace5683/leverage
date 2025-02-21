@@ -348,15 +348,12 @@
                 daySelect.value = '';
             }
         }
-
         function convertDate(year, month, day, isSolar) {
             try {
                 if (isSolar) {
                     // 양력 -> 음력 변환
-                    const dateString = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-                    const date = lunisolar(dateString);
-                    const lunar = date.lunar;
-            
+                    const lunarDate = holidayKR.getLunar(year, month, day);
+                    
                     return {
                         solar: {
                             year: year,
@@ -364,41 +361,35 @@
                             day: day
                         },
                         lunar: {
-                            year: lunar.year,
-                            month: lunar.month,
-                            day: lunar.day
+                            year: lunarDate.year,
+                            month: lunarDate.month,
+                            day: lunarDate.day,
+                            isLeapMonth: lunarDate.leapMonth
                         }
                     };
                 } else {
                     // 음력 -> 양력 변환
-                    try {
-                        // lunisolar 라이브러리의 음력 변환 메서드 직접 사용
-                        const lunarToSolarDate = lunisolar.lunar(year, month, day);
-                        
-                        return {
-                            solar: {
-                                year: lunarToSolarDate.year,
-                                month: lunarToSolarDate.month,
-                                day: lunarToSolarDate.day
-                            },
-                            lunar: {
-                                year: year,
-                                month: month,
-                                day: day
-                            }
-                        };
-                    } catch (lunarConversionError) {
-                        // 변환 실패 시 더 구체적인 오류 처리
-                        console.error('음력 변환 중 오류:', lunarConversionError);
-                        throw new Error('올바르지 않은 음력 날짜입니다. 다시 확인해주세요.');
-                    }
+                    const solarDate = holidayKR.getSolar(year, month, day);
+                    
+                    return {
+                        solar: {
+                            year: solarDate.year,
+                            month: solarDate.month,
+                            day: solarDate.day
+                        },
+                        lunar: {
+                            year: year,
+                            month: month,
+                            day: day
+                        }
+                    };
                 }
             } catch (error) {
                 console.error('날짜 변환 중 오류:', error);
-                throw error;
+                throw new Error('올바르지 않은 날짜입니다. 다시 확인해주세요.');
             }
         }
-        
+
         // 날짜 유효성 검사 함수 추가
         function isValidDate(year, month, day) {
             const date = new Date(year, month - 1, day);
